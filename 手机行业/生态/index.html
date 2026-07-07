@@ -23,14 +23,9 @@
   .item .badge { position: absolute; top: 14px; right: 14px; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
   .badge-folder { background: #eef2ff; color: #4338ca; }
   .badge-project { background: #dcfce7; color: #166534; }
-  .badge-file { background: #fef3c7; color: #854d0e; }
   .item.is-folder { border-left: 3px solid #5b6cff; }
   .item.is-project { border-left: 3px solid #16a34a; }
-  .item.is-file { border-left: 3px solid #d97706; }
   .empty { background: #fff; border: 1px dashed #d0d7de; border-radius: 12px; padding: 50px 20px; text-align: center; color: #9ca3af; font-size: 14px; }
-  .loading { background: #fff; border: 1px solid #d0d7de; border-radius: 12px; padding: 50px 20px; text-align: center; color: #9ca3af; }
-  .err { color: #cf1322; padding: 18px 20px; background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; }
-  .err code { background: #ffd6d6; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
   @media (max-width: 600px) {
     .wrap { margin: 24px auto; }
     .grid { grid-template-columns: 1fr; }
@@ -42,24 +37,24 @@
   <h1>AMS_Phone 看板中心</h1>
   <div class="sub">对外看板发布站点 · 手机行业 ｜ 品宣 · 生态 · 加粉 · 卖货</div>
   <div class="crumb" id="crumb"></div>
-  <div id="content" class="loading">加载中…</div>
+  <div id="content"></div>
 </div>
 <script>
 (async function() {
-  const REPO = "AFKforLegendary/AMS_Phone";
-  const PREFIX = "/AMS_Phone/";
-  const RAW = window.location.pathname;
+  var PREFIX = "/AMS_Phone/";
+  var RAW = window.location.pathname;
 
-  // 解析当前路径
-  let sub = RAW.startsWith(PREFIX) ? RAW.slice(PREFIX.length) : RAW;
+  // 解析当前路径（去除前缀和末尾斜杠/index.html）
+  var sub = RAW.startsWith(PREFIX) ? RAW.slice(PREFIX.length) : RAW;
   sub = sub.replace(/index\.html$/, "").replace(/\/$/, "");
-  const parts = sub.split("/").filter(Boolean).map(decodeURIComponent);
+  var key = sub ? decodeURIComponent(sub) : "";
 
-  // 面包屑
-  const crumb = document.getElementById("crumb");
-  let html = '<a href="/AMS_Phone/">看板中心</a>';
-  let acc = "";
-  for (let i = 0; i < parts.length; i++) {
+  // 构建面包屑
+  var crumb = document.getElementById("crumb");
+  var parts = key.split("/").filter(Boolean);
+  var html = '<a href="/AMS_Phone/">看板中心</a>';
+  var acc = "";
+  for (var i = 0; i < parts.length; i++) {
     acc += encodeURIComponent(parts[i]) + "/";
     if (i === parts.length - 1) {
       html += '<span class="sep">›</span><span class="cur">' + parts[i] + "</span>";
@@ -69,56 +64,41 @@
   }
   crumb.innerHTML = html;
 
-  // 拉取子内容
-  const apiUrl = "https://api.github.com/repos/" + REPO + "/contents/" + parts.map(encodeURIComponent).join("/");
-  let items;
+  // 加载 tree.json
+  var tree;
   try {
-    const r = await fetch(apiUrl, { headers: { "Accept": "application/vnd.github+json" } });
-    items = await r.json();
-    if (!Array.isArray(items)) throw new Error(items.message || "API 返回异常");
+    var resp = await fetch("/AMS_Phone/tree.json?t=" + Date.now());
+    tree = await resp.json();
   } catch (e) {
-    document.getElementById("content").innerHTML =
-      '<div class="err">加载失败:<code>' + (e.message || e) + "</code><br>可能 GitHub API 限流,请稍后再试。</div>";
+    document.getElementById("content").innerHTML = '<div class="empty">⚠️ 加载结构失败，请刷新页面重试</div>';
     return;
   }
 
-  // 分类
-  const folders = items.filter(i => i.type === "dir");
-  const files = items.filter(i => i.type === "file" && i.name !== "README.md" && (i.name.endsWith(".html") || i.name.endsWith(".htm")));
+  // 查找当前路径的子节点
+  var children = tree[key];
 
-  if (folders.length === 0 && files.length === 0) {
+  if (!children || children.length === 0) {
     document.getElementById("content").innerHTML = '<div class="empty">📂 此目录下暂无内容</div>';
     return;
   }
 
-  // 排序: 文件夹优先(项目按日期倒序,普通文件夹按字母)
-  const isProjectName = n => /^\d{8}_/.test(n);
-  folders.sort((a, b) => {
-    const ap = isProjectName(a.name), bp = isProjectName(b.name);
-    if (ap && bp) return b.name.localeCompare(a.name);
+  // 排序：项目按日期倒序，文件夹按名称
+  children = children.slice().sort(function(a, b) {
+    var ap = /^\d{8}_/.test(a), bp = /^\d{8}_/.test(b);
+    if (ap && bp) return b.localeCompare(a);
     if (ap !== bp) return ap ? 1 : -1;
-    return a.name.localeCompare(b.name, "zh-CN");
+    return a.localeCompare(b, "zh-CN");
   });
-  files.sort((a, b) => a.name.localeCompare(b.name, "zh-CN"));
 
-  let grid = '<div class="grid">';
-  for (const f of folders) {
-    const isProj = isProjectName(f.name);
-    const cls = isProj ? "is-project" : "is-folder";
-    const badge = isProj ? '<span class="badge badge-project">项目</span>' : '<span class="badge badge-folder">文件夹</span>';
-    const label = isProj ? f.name.replace(/^\d{8}_/, "") : "点击进入";
-    grid += '<a class="item ' + cls + '" href="' + encodeURIComponent(f.name) + '/">' +
-      badge +
-      '<div class="t">' + f.name + '</div>' +
-      '<div class="d">' + label + '</div>' +
-      '</a>';
-  }
-  for (const f of files) {
-    grid += '<a class="item is-file" href="' + encodeURIComponent(f.name) + '">' +
-      '<span class="badge badge-file">文件</span>' +
-      '<div class="t">' + f.name + '</div>' +
-      '<div class="d">直接访问</div>' +
-      '</a>';
+  var grid = '<div class="grid">';
+  for (var j = 0; j < children.length; j++) {
+    var name = children[j];
+    var isProj = /^\d{8}_/.test(name);
+    var cls = isProj ? "is-project" : "is-folder";
+    var badge = isProj ? '<span class="badge badge-project">项目</span>' : '<span class="badge badge-folder">文件夹</span>';
+    var label = isProj ? name.replace(/^\d{8}_/, "") : "点击进入";
+    grid += '<a class="item ' + cls + '" href="' + encodeURIComponent(name) + '/">' +
+      badge + '<div class="t">' + name + '</div><div class="d">' + label + '</div></a>';
   }
   grid += "</div>";
   document.getElementById("content").innerHTML = grid;
