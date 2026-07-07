@@ -1,21 +1,21 @@
 {
   "": [
-    "手机行业"
+    "Mobile"
   ],
-  "手机行业": [
-    "加粉",
-    "卖货",
-    "品宣",
-    "生态"
+  "Mobile": [
+    "Campaign",
+    "E_Commerce",
+    "Eco",
+    "Fans"
   ],
-  "手机行业/品宣": [],
-  "手机行业/生态": [
+  "Mobile/Campaign": [],
+  "Mobile/Eco": [
     "OPPO"
   ],
-  "手机行业/生态/OPPO": [
-    "20260703_掉量复盘",
-    "20260707_每日看板"
+  "Mobile/Eco/OPPO": [
+    "20260703_Review",
+    "20260707_Daily"
   ],
-  "手机行业/加粉": [],
-  "手机行业/卖货": []
+  "Mobile/Fans": [],
+  "Mobile/E_Commerce": []
 }
