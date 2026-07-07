@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMS_Phone 看板中心</title>
+<title>AMS_AFK Dashboard</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f6f8fa; color: #24292f; line-height: 1.6; }
@@ -34,55 +34,49 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>AMS_Phone 看板中心</h1>
-  <div class="sub">对外看板发布站点 · 手机行业 ｜ 品宣 · 生态 · 加粉 · 卖货</div>
+  <h1>AMS AFK Dashboard</h1>
+  <div class="sub">Mobile Industry · Campaign | Eco | Fans | E_Commerce</div>
   <div class="crumb" id="crumb"></div>
   <div id="content"></div>
 </div>
 <script>
 (async function() {
-  var PREFIX = "/AMS_Phone/";
+  var PREFIX = "/AMS_AFK/";
   var RAW = window.location.pathname;
 
-  // 解析当前路径（去除前缀和末尾斜杠/index.html）
   var sub = RAW.startsWith(PREFIX) ? RAW.slice(PREFIX.length) : RAW;
   sub = sub.replace(/index\.html$/, "").replace(/\/$/, "");
   var key = sub ? decodeURIComponent(sub) : "";
 
-  // 构建面包屑
   var crumb = document.getElementById("crumb");
   var parts = key.split("/").filter(Boolean);
-  var html = '<a href="/AMS_Phone/">看板中心</a>';
+  var html = '<a href="/AMS_AFK/">Dashboard</a>';
   var acc = "";
   for (var i = 0; i < parts.length; i++) {
     acc += encodeURIComponent(parts[i]) + "/";
     if (i === parts.length - 1) {
-      html += '<span class="sep">›</span><span class="cur">' + parts[i] + "</span>";
+      html += '<span class="sep">&#8250;</span><span class="cur">' + parts[i] + "</span>";
     } else {
-      html += '<span class="sep">›</span><a href="/AMS_Phone/' + acc + '">' + parts[i] + "</a>";
+      html += '<span class="sep">&#8250;</span><a href="/AMS_AFK/' + acc + '">' + parts[i] + "</a>";
     }
   }
   crumb.innerHTML = html;
 
-  // 加载 tree.json
   var tree;
   try {
-    var resp = await fetch("/AMS_Phone/tree.json?t=" + Date.now());
+    var resp = await fetch("/AMS_AFK/tree.json?t=" + Date.now());
     tree = await resp.json();
   } catch (e) {
-    document.getElementById("content").innerHTML = '<div class="empty">⚠️ 加载结构失败，请刷新页面重试</div>';
+    document.getElementById("content").innerHTML = '<div class="empty">Failed to load. Please refresh.</div>';
     return;
   }
 
-  // 查找当前路径的子节点
   var children = tree[key];
-
   if (!children || children.length === 0) {
-    document.getElementById("content").innerHTML = '<div class="empty">📂 此目录下暂无内容</div>';
+    document.getElementById("content").innerHTML = '<div class="empty">Nothing here yet</div>';
     return;
   }
 
-  // 排序：项目按日期倒序，文件夹按名称
   children = children.slice().sort(function(a, b) {
     var ap = /^\d{8}_/.test(a), bp = /^\d{8}_/.test(b);
     if (ap && bp) return b.localeCompare(a);
@@ -95,8 +89,8 @@
     var name = children[j];
     var isProj = /^\d{8}_/.test(name);
     var cls = isProj ? "is-project" : "is-folder";
-    var badge = isProj ? '<span class="badge badge-project">项目</span>' : '<span class="badge badge-folder">文件夹</span>';
-    var label = isProj ? name.replace(/^\d{8}_/, "") : "点击进入";
+    var badge = isProj ? '<span class="badge badge-project">Project</span>' : '<span class="badge badge-folder">Folder</span>';
+    var label = isProj ? name.replace(/^\d{8}_/, "") : "Open";
     grid += '<a class="item ' + cls + '" href="' + encodeURIComponent(name) + '/">' +
       badge + '<div class="t">' + name + '</div><div class="d">' + label + '</div></a>';
   }
