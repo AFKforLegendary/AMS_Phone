@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMS_AFK Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f6f8fa; color: #24292f; line-height: 1.6; }
+  .wrap { max-width: 880px; margin: 50px auto; padding: 0 24px; }
+  h1 { font-size: 26px; margin-bottom: 8px; }
+  .sub { color: #57606a; font-size: 15px; margin-bottom: 28px; }
+  .crumb { font-size: 13px; color: #57606a; margin-bottom: 18px; }
+  .crumb a { color: #1a73e8; text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  .crumb .sep { margin: 0 6px; color: #c0c4cc; }
+  .crumb .cur { color: #1f2937; font-weight: 500; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .item { display: block; text-decoration: none; color: inherit; border: 1px solid #d0d7de; border-radius: 10px; padding: 18px 20px; transition: border-color .15s, box-shadow .15s, transform .15s; background: #fff; position: relative; }
+  .item:hover { border-color: #1a73e8; box-shadow: 0 4px 12px rgba(26,115,232,.12); transform: translateY(-1px); }
+  .item .t { font-size: 15px; font-weight: 600; color: #1a3a5c; margin-bottom: 4px; padding-right: 24px; word-break: break-all; }
+  .item .d { font-size: 12px; color: #57606a; }
+  .item .badge { position: absolute; top: 14px; right: 14px; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+  .badge-folder { background: #eef2ff; color: #4338ca; }
+  .badge-project { background: #dcfce7; color: #166534; }
+  .item.is-folder { border-left: 3px solid #5b6cff; }
+  .item.is-project { border-left: 3px solid #16a34a; }
+  .empty { background: #fff; border: 1px dashed #d0d7de; border-radius: 12px; padding: 50px 20px; text-align: center; color: #9ca3af; font-size: 14px; }
+  @media (max-width: 600px) {
+    .wrap { margin: 24px auto; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AMS AFK Dashboard</h1>
+  <div class="sub">Phone Industry · Campaign | Eco | Fans | E_Commerce</div>
+  <div class="crumb" id="crumb"></div>
+  <div id="content"></div>
+</div>
+<script>
+(async function() {
+  var PREFIX = "/AMS_AFK/";
+  var RAW = window.location.pathname;
+  var sub = RAW.startsWith(PREFIX) ? RAW.slice(PREFIX.length) : RAW;
+  sub = sub.replace(/index\.html$/, "").replace(/\/$/, "");
+  var key = sub ? decodeURIComponent(sub) : "";
+  var crumb = document.getElementById("crumb");
+  var parts = key.split("/").filter(Boolean);
+  var html = '<a href="/AMS_AFK/">Dashboard</a>';
+  var acc = "";
+  for (var i = 0; i < parts.length; i++) {
+    acc += encodeURIComponent(parts[i]) + "/";
+    if (i === parts.length - 1)
+      html += '<span class="sep">&#8250;</span><span class="cur">' + parts[i] + "</span>";
+    else
+      html += '<span class="sep">&#8250;</span><a href="/AMS_AFK/' + acc + '">' + parts[i] + "</a>";
+  }
+  crumb.innerHTML = html;
+  var tree;
+  try {
+    var resp = await fetch("/AMS_AFK/tree.json?t=" + Date.now());
+    tree = await resp.json();
+  } catch (e) {
+    document.getElementById("content").innerHTML = '<div class="empty">Failed to load. Please refresh.</div>';
+    return;
+  }
+  var children = tree[key];
+  if (!children || children.length === 0) {
+    document.getElementById("content").innerHTML = '<div class="empty">Nothing here yet</div>';
+    return;
+  }
+  children = children.slice().sort(function(a, b) {
+    var ap = /^\d{8}_/.test(a), bp = /^\d{8}_/.test(b);
+    if (ap && bp) return b.localeCompare(a);
+    if (ap !== bp) return ap ? 1 : -1;
+    return a.localeCompare(b, "zh-CN");
+  });
+  var grid = '<div class="grid">';
+  for (var j = 0; j < children.length; j++) {
+    var name = children[j];
+    var isProj = /^\d{8}_/.test(name);
+    var cls = isProj ? "is-project" : "is-folder";
+    var badge = isProj ? '<span class="badge badge-project">Project</span>' : '<span class="badge badge-folder">Folder</span>';
+    var label = isProj ? name.replace(/^\d{8}_/, "") : "Open";
+    grid += '<a class="item ' + cls + '" href="' + encodeURIComponent(name) + '/">' +
+      badge + '<div class="t">' + name + '</div><div class="d">' + label + '</div></a>';
+  }
+  grid += "</div>";
+  document.getElementById("content").innerHTML = grid;
+})();
+</script>
+</body>
+</html>
