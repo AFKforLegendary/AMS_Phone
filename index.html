@@ -35,7 +35,7 @@
 <body>
 <div class="wrap">
   <h1>AMS AFK Dashboard</h1>
-  <div class="sub">Mobile Industry · Campaign | Eco | Fans | E_Commerce</div>
+  <div class="sub">Phone Industry · Campaign | Eco | Fans | E_Commerce</div>
   <div class="crumb" id="crumb"></div>
   <div id="content"></div>
 </div>
@@ -43,25 +43,21 @@
 (async function() {
   var PREFIX = "/AMS_AFK/";
   var RAW = window.location.pathname;
-
   var sub = RAW.startsWith(PREFIX) ? RAW.slice(PREFIX.length) : RAW;
   sub = sub.replace(/index\.html$/, "").replace(/\/$/, "");
   var key = sub ? decodeURIComponent(sub) : "";
-
   var crumb = document.getElementById("crumb");
   var parts = key.split("/").filter(Boolean);
   var html = '<a href="/AMS_AFK/">Dashboard</a>';
   var acc = "";
   for (var i = 0; i < parts.length; i++) {
     acc += encodeURIComponent(parts[i]) + "/";
-    if (i === parts.length - 1) {
+    if (i === parts.length - 1)
       html += '<span class="sep">&#8250;</span><span class="cur">' + parts[i] + "</span>";
-    } else {
+    else
       html += '<span class="sep">&#8250;</span><a href="/AMS_AFK/' + acc + '">' + parts[i] + "</a>";
-    }
   }
   crumb.innerHTML = html;
-
   var tree;
   try {
     var resp = await fetch("/AMS_AFK/tree.json?t=" + Date.now());
@@ -70,20 +66,17 @@
     document.getElementById("content").innerHTML = '<div class="empty">Failed to load. Please refresh.</div>';
     return;
   }
-
   var children = tree[key];
   if (!children || children.length === 0) {
     document.getElementById("content").innerHTML = '<div class="empty">Nothing here yet</div>';
     return;
   }
-
   children = children.slice().sort(function(a, b) {
     var ap = /^\d{8}_/.test(a), bp = /^\d{8}_/.test(b);
     if (ap && bp) return b.localeCompare(a);
     if (ap !== bp) return ap ? 1 : -1;
     return a.localeCompare(b, "zh-CN");
   });
-
   var grid = '<div class="grid">';
   for (var j = 0; j < children.length; j++) {
     var name = children[j];
