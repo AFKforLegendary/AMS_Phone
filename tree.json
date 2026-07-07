@@ -1,21 +1,27 @@
 {
   "": [
-    "Mobile"
+    "Phone"
   ],
-  "Mobile": [
+  "Phone": [
     "Campaign",
     "E_Commerce",
     "Eco",
     "Fans"
   ],
-  "Mobile/Campaign": [],
-  "Mobile/Eco": [
+  "Phone/Campaign": [],
+  "Phone/Eco": [
     "OPPO"
   ],
-  "Mobile/Eco/OPPO": [
-    "20260703_Review",
+  "Phone/Eco/OPPO": [
+    "Daily_Kanban",
+    "Review"
+  ],
+  "Phone/Eco/OPPO/Daily_Kanban": [
     "20260707_Daily"
   ],
-  "Mobile/Fans": [],
-  "Mobile/E_Commerce": []
+  "Phone/Eco/OPPO/Review": [
+    "20260703_Review"
+  ],
+  "Phone/Fans": [],
+  "Phone/E_Commerce": []
 }
