@@ -1,27 +1,26 @@
 {
-  "": [
-    "Phone"
+  "Phone/Eco/OPPO/Daily_Kanban": [
+    "20260707_Daily",
+    "20260708_Daily"
   ],
-  "Phone": [
-    "Campaign",
-    "E_Commerce",
-    "Eco",
-    "Fans"
+  "Phone/Eco/OPPO/Review/20260703_Review": [
+    "img"
   ],
-  "Phone/Campaign": [],
-  "Phone/Eco": [
-    "OPPO"
+  "Phone/Eco/OPPO/Review": [
+    "20260703_Review"
   ],
   "Phone/Eco/OPPO": [
     "Daily_Kanban",
     "Review"
   ],
-  "Phone/Eco/OPPO/Daily_Kanban": [
-    "20260707_Daily"
+  "Phone/Eco": [
+    "OPPO"
   ],
-  "Phone/Eco/OPPO/Review": [
-    "20260703_Review"
-  ],
-  "Phone/Fans": [],
-  "Phone/E_Commerce": []
+  "Phone": [
+    "Campaign",
+    "E_Commerce",
+    "Eco",
+    "Fans",
+    "index.html"
+  ]
 }
