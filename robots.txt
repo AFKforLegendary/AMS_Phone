@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /Phone/
+Allow: /Phone/Eco/OPPO/Daily_Kanban/*/index.html
