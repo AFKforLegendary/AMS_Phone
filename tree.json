@@ -1,5 +1,5 @@
 {
-  ".": [
+  "": [
     "Phone"
   ],
   "Phone": [
@@ -9,7 +9,8 @@
     "Fans"
   ],
   "Phone/Eco": [
-    "OPPO"
+    "OPPO",
+    "Xiaomi"
   ],
   "Phone/Eco/OPPO": [
     "Daily_Kanban",
@@ -20,12 +21,20 @@
     "20260708_Daily",
     "20260709_Daily",
     "20260710_Daily",
-    "20260713_Daily"
+    "20260713_Daily",
+    "20260714_Daily"
   ],
   "Phone/Eco/OPPO/Review": [
     "20260703_Review"
   ],
   "Phone/Eco/OPPO/Review/20260703_Review": [
     "img"
+  ],
+  "Phone/Eco/Xiaomi": [
+    "Daily_Kanban"
+  ],
+  "Phone/Eco/Xiaomi/Daily_Kanban": [
+    "20260712_Daily",
+    "20260714_Daily"
   ]
 }
