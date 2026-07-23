@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小米应用商店by 日投放看板 · 2026-07-22</title>
+<style>
+:root {
+  --bg: #F7F8FB; --bg2: #EEF1F6; --panel: #FFFFFF; --panel2: #F4F6FA;
+  --line: #E5E8EF; --line2: #EDF0F5; --txt: #1F2937; --sub: #6B7280; --sub2: #9CA3AF;
+  --accent: #5B6CFF; --accent2: #7C5CFF; --up: #16A34A; --down: #DC2626;
+  --warn: #D97706; --good: #16A34A; --bad: #DC2626;
+  --chip: #EEF2FF; --chip-txt: #4338CA;
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04);
+  --shadow-md: 0 1px 3px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{padding:0 0 80px}
+.wrap{max-width:1320px;margin:0 auto;padding:0 28px}
+
+/* Header */
+header{padding:28px 0 14px;background:linear-gradient(180deg,#fff 0%,var(--bg) 100%);border-bottom:1px solid var(--line);margin-bottom:20px}
+header .badge{display:inline-block;font-size:11px;letter-spacing:2px;color:var(--accent);background:rgba(91,108,255,.08);border:1px solid rgba(91,108,255,.25);padding:4px 12px;border-radius:20px;margin-bottom:10px;font-weight:600}
+header h1{font-size:26px;font-weight:800;letter-spacing:1px;color:#0F172A}
+header h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+header .meta{margin-top:10px;color:var(--sub);font-size:13px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+header .meta b{color:var(--txt);font-weight:600}
+
+/* Tab Nav */
+.tab-nav{display:flex;gap:0;margin-bottom:0;background:var(--panel);border-radius:14px 14px 0 0;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);border-bottom:none}
+.tab-btn{flex:1;padding:14px 20px;border:none;background:var(--panel2);color:var(--sub);font-size:14.5px;font-weight:600;cursor:pointer;transition:.2s;border-right:1px solid var(--line);position:relative}
+.tab-btn:last-child{border-right:none}
+.tab-btn:hover{background:#F0F2FF;color:var(--accent)}
+.tab-btn.active{background:var(--panel);color:var(--accent);font-weight:800}
+.tab-btn.active::after{content:"";position:absolute;bottom:0;left:12px;right:12px;height:3px;background:var(--accent);border-radius:2px 2px 0 0}
+.tab-content{display:none;background:var(--panel);border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;padding:28px 32px;box-shadow:var(--shadow)}
+.tab-content.active{display:block}
+
+section{margin-bottom:36px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:6px 0}
+.sec-head .no{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.sec-head h2{font-size:18px;font-weight:700;color:#0F172A}
+.sec-head p{color:var(--sub);font-size:12px;margin-left:4px}
+
+.subsec-head{margin:22px 0 10px;font-size:14px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:8px}
+.subsec-head::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent2))}
+.subsec-head .badge{font-size:11px;font-weight:500;background:var(--panel2);color:var(--sub);padding:2px 8px;border-radius:10px;margin-left:4px}
+
+.kpi-row{display:grid;gap:12px;margin-bottom:12px}
+.kpi-row.row1{grid-template-columns:1fr 1.3fr 1.3fr}
+.kpi-row.row2{grid-template-columns:repeat(5,1fr)}
+.kpi-row.row3{grid-template-columns:repeat(6,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.card .lbl{color:var(--sub);font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-weight:500}
+.card .val{font-size:22px;font-weight:800;color:#0F172A;letter-spacing:.2px;font-variant-numeric:tabular-nums}
+.card .val-sm{font-size:17px}
+.card .unit{font-size:12px;color:var(--sub);font-weight:500;margin-left:3px}
+.card .chg{font-size:12px;margin-top:4px;font-weight:500}
+.card.kpi-big{background:linear-gradient(135deg,#5B6CFF 0%,#7C5CFF 100%);color:#fff;border:none}
+.card.kpi-big .lbl,.card.kpi-big .unit{color:rgba(255,255,255,.85)}
+.card.kpi-big .val{color:#fff;font-size:28px}
+.card.kpi-big .chg{color:rgba(255,255,255,.9)}
+
+.pie{display:flex;align-items:center;gap:14px}
+.pie svg{flex-shrink:0}
+.pie-legend{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pie-legend .li{display:flex;align-items:center;gap:7px;font-size:12px;min-width:0}
+.pie-legend .sw{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+.pie-legend .nm{flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+.pie-legend .vl{font-weight:600;color:#0F172A;font-variant-numeric:tabular-nums;flex-shrink:0;font-size:12px}
+.pie-legend .pc{color:var(--sub);font-size:11px;width:40px;text-align:right;flex-shrink:0}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+
+/* Agent horizontal table */
+.agent-h-tbl{background:var(--panel);border-radius:10px;padding:12px 16px;margin-bottom:10px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.agent-h-tbl .ah{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.agent-h-tbl .nm{font-size:14px;font-weight:700;color:#0F172A}
+.agent-h-tbl .nm .id{color:var(--sub);font-size:11px;font-weight:500;margin-left:6px}
+.agent-h-tbl .cost-pill{background:rgba(91,108,255,.08);color:var(--accent);font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600}
+.agent-h-tbl table{table-layout:fixed;width:100%}
+.agent-h-tbl th,.agent-h-tbl td{text-align:center;padding:7px 4px;font-size:11.5px}
+.agent-h-tbl th{color:var(--sub);font-weight:600;border-bottom:1px solid var(--line)}
+.agent-h-tbl td{color:var(--txt);font-variant-numeric:tabular-nums}
+.agent-h-tbl tr.row-name td{color:var(--sub);font-size:10.5px;background:var(--panel2);font-weight:600;border-bottom:1px solid var(--line)}
+.agent-h-tbl tr.row-data td{font-size:13px;font-weight:600;color:#0F172A}
+.agent-h-tbl tr.row-chg td{font-size:11.5px;font-weight:700}
+
+.chg-up{color:var(--down);font-weight:700}
+.chg-down{color:var(--up);font-weight:700}
+.chg-flat{color:var(--sub2)}
+
+/* Goal card / table */
+.goal-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.goal-card .ghead{padding:10px 16px;font-size:14px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.goal-card .ghead .sw{width:8px;height:8px;border-radius:2px}
+.goal-card .ghead .meta{color:var(--sub);font-size:11px;font-weight:500;margin-left:auto}
+.goal-card table{table-layout:fixed;width:100%}
+.goal-card th,.goal-card td{padding:8px 10px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+.goal-card th{color:var(--sub);font-weight:600;background:var(--panel2);border-bottom:1px solid var(--line)}
+.goal-card th:first-child,.goal-card td:first-child{text-align:left}
+.goal-card tbody tr{border-bottom:1px solid var(--line2)}
+.goal-card tbody tr:last-child{border-bottom:none}
+.goal-card tbody tr:hover{background:#F9FAFF}
+.goal-card .agent-name{color:var(--accent);font-weight:600}
+.goal-card td.best{color:var(--down);font-weight:800}
+.goal-card .chg-cell{font-weight:700}
+.goal-card.g104 .ghead{background:#F5F7FF}.goal-card.g104 .ghead .sw{background:#5B6CFF}
+.goal-card.g204 .ghead{background:#F0FDF4}.goal-card.g204 .ghead .sw{background:#16A34A}
+.goal-card.g30022 .ghead{background:#FFFBEB}.goal-card.g30022 .ghead .sw{background:#F59E0B}
+.goal-card.g301 .ghead{background:#FDF2F8}.goal-card.g301 .ghead .sw{background:#EC4899}
+
+/* Findings table */
+.findings-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;margin-top:4px}
+.findings-tbl th{background:var(--panel2);color:var(--sub);font-weight:700;padding:8px 10px;text-align:left;font-size:11.5px;border-bottom:1px solid var(--line);border-top:1px solid var(--line)}
+.findings-tbl th:first-child{width:16%}
+.findings-tbl th:nth-child(2){width:44%}
+.findings-tbl th:last-child{width:40%}
+.findings-tbl td{padding:10px 10px;vertical-align:top;border-bottom:1px solid var(--line2);line-height:1.6;font-size:12px}
+.findings-tbl td.col1{font-weight:700;color:#0F172A;font-size:12.5px}
+.findings-tbl td.col2{color:var(--txt)}
+.findings-tbl td.col3{color:var(--txt);background:#FAFBFF;border-left:1px dashed var(--line)}
+.findings-tbl tr:last-child td{border-bottom:none}
+.findings-tbl tr:hover td{background:#F9FAFF}
+.findings-tbl tr:hover td.col3{background:#F0F2FF}
+.findings-tbl .row-high td.col1{color:#B91C1C}
+.findings-tbl .row-mid td.col1{color:#B45309}
+.findings-tbl .row-info td.col1{color:#4338CA}
+.findings-tbl .row-good td.col1{color:#15803D}
+.findings-tbl .badge-h{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:700;margin-right:6px;vertical-align:middle}
+.findings-tbl .row-high .badge-h{background:rgba(220,38,38,.10);color:#B91C1C}
+.findings-tbl .row-mid .badge-h{background:rgba(217,119,6,.10);color:#B45309}
+.findings-tbl .row-info .badge-h{background:rgba(91,108,255,.10);color:#4338CA}
+.findings-tbl .row-good .badge-h{background:rgba(22,163,74,.10);color:#15803D}
+.findings-tbl td.col3 .sol-list{list-style:none;padding:0;margin:0;counter-reset:solitem}
+.findings-tbl td.col3 .sol-list li{position:relative;padding:4px 0 4px 22px;font-size:13.5px;line-height:1.6;color:var(--txt)}
+.findings-tbl td.col3 .sol-list li::before{counter-increment:solitem;content:counter(solitem);position:absolute;left:0;top:4px;width:16px;height:16px;line-height:16px;text-align:center;font-size:10px;font-weight:700;color:#fff;background:var(--accent);border-radius:50%}
+
+/* Common issues */
+.common-issue{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.common-issue .ci-head{padding:10px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.common-issue .ci-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700}
+.common-issue .ci-body{padding:10px 16px;font-size:12.5px;line-height:1.7}
+.common-issue .ci-body .ag-list{margin-top:8px;padding-left:0;list-style:none}
+.common-issue .ci-body .ag-list li{padding:4px 0;display:flex;gap:6px}
+.common-issue .ci-body .ag-list .agn{font-weight:700;min-width:40px;color:var(--accent)}
+.common-issue .ci-body .sol-box{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:14px}
+.common-issue .ci-body .sol-box::before{content:"💡 处置建议";display:block;font-weight:700;color:var(--accent);margin-bottom:4px;font-size:11px}
+
+/* CI severity colors */
+.ci-high .ci-head{background:#FEF7F7}.ci-high .ci-badge{background:rgba(220,38,38,.10);color:#B91C1C}
+.ci-mid .ci-head{background:#FFFCF5}.ci-mid .ci-badge{background:rgba(217,119,6,.10);color:#B45309}
+.ci-info .ci-head{background:#F5F7FF}.ci-info .ci-badge{background:rgba(91,108,255,.10);color:#4338CA}
+.ci-good .ci-head{background:#F0FDF4}.ci-good .ci-badge{background:rgba(22,163,74,.10);color:#15803D}
+
+/* Expandable goal detail — 单卡 + 平铺表头 + 按占比排序 */
+.goal-expand{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.ge-outer{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;table-layout:fixed}
+.ge-outer thead{background:var(--panel2);color:var(--sub);font-weight:700}
+.ge-outer th{padding:10px 8px;text-align:right;font-size:11.5px;border-bottom:1px solid var(--line);font-weight:700}
+.ge-outer th:nth-child(2){text-align:left}
+.ge-outer td{padding:10px 8px;text-align:right;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ge-outer .ge-row{cursor:pointer;transition:.15s}
+.ge-outer .ge-row td{border-bottom:1px solid var(--line2);background:#fff;font-size:12.5px}
+.ge-outer .ge-row:hover td{background:#F9FAFF}
+.ge-outer .ge-row-open td{background:#F5F7FF;font-weight:700}
+.ge-outer .ge-row-open td.ge-name{color:var(--accent)}
+.ge-outer .ge-name{text-align:left;color:#0F172A;font-weight:700;font-size:13.5px}
+.ge-outer .ge-pct{color:var(--accent);font-weight:700}
+.ge-outer .ge-arrow{text-align:center;width:30px}
+.ge-outer .ge-toggle{display:inline-block;color:var(--accent);font-size:10px;transition:.2s}
+.ge-outer .ge-row-open .ge-toggle{transform:rotate(0deg)}
+.ge-outer .ge-body{display:table-row;background:#F8F9FC}
+.ge-outer .ge-body>td{padding:0 8px 12px 30px;background:#F8F9FC;border-bottom:2px solid var(--accent);background-image:linear-gradient(135deg,rgba(91,108,255,.02) 0%,rgba(124,92,255,.02) 100%)}
+.ge-outer .ge-body-inner{padding:8px 0 4px}
+.ge-outer .ge-inner{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.ge-outer .ge-inner th{background:rgba(91,108,255,.06);color:var(--accent);font-weight:600;padding:7px 8px;text-align:right;font-size:11px;border-bottom:1px solid rgba(91,108,255,.2)}
+.ge-outer .ge-inner th:first-child{text-align:left}
+.ge-outer .ge-inner td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line2)}
+.ge-outer .ge-inner td:first-child{text-align:left;font-weight:600;color:var(--accent)}
+.ge-outer .ge-inner tr:last-child td{border-bottom:none}
+.ge-outer .ge-inner tr:hover td{background:rgba(91,108,255,.04)}
+
+/* Agent selector */
+.agent-select-wrap{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.agent-select-wrap label{font-weight:700;font-size:14px;color:#0F172A}
+.agent-select-wrap select{padding:8px 14px;border:2px solid var(--line);border-radius:8px;font-size:14px;font-weight:600;color:var(--txt);background:var(--panel);cursor:pointer;outline:none}
+.agent-select-wrap select:focus{border-color:var(--accent)}
+
+/* Single agent goal table */
+.agent-goal-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;margin-bottom:16px}
+.agent-goal-tbl th{background:var(--panel2);color:var(--sub);font-weight:700;padding:10px 12px;text-align:right;font-size:12px;border-bottom:1px solid var(--line)}
+.agent-goal-tbl th:first-child{text-align:left}
+.agent-goal-tbl td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+.agent-goal-tbl td:first-child{text-align:left;font-weight:700;color:#0F172A}
+.agent-goal-tbl tr:hover td{background:#F9FAFF}
+
+/* Spec card / apps table */
+.spec-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.spec-card h3{font-size:15px;font-weight:700;margin-bottom:4px;color:#0F172A}
+.spec-card .cs{color:var(--sub);font-size:11px;margin-bottom:12px}
+.app-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.app-table th{background:var(--panel2);color:var(--sub);font-weight:600;padding:9px 10px;text-align:right;font-size:11.5px;border-bottom:1px solid var(--line)}
+.app-table th:first-child{text-align:center;width:45px}
+.app-table th:nth-child(2){text-align:left}
+.app-table td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+.app-table td:first-child{text-align:center;color:var(--sub);font-weight:700}
+.app-table td:nth-child(2){text-align:left;color:#0F172A;font-weight:600}
+.app-table tr:last-child td{border-bottom:none}
+.app-table tr:hover td{background:#F9FAFF}
+.app-table .rank-top{color:var(--down);font-weight:800}
+.app-table td.bold-col{font-weight:700}
+.app-table td.best-cell{color:var(--down);font-weight:800}
+
+/* Third / PCK sections */
+.third-overview{background:linear-gradient(135deg,#F5F7FF 0%,#FAFBFF 100%);border:1px solid rgba(91,108,255,.2);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.third-overview .h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.third-overview .h::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.third-overview .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.third-overview .st{background:#fff;border-radius:7px;padding:8px 10px}
+.third-overview .st .sl{color:var(--sub);font-size:10.5px;margin-bottom:2px}
+.third-overview .st .sv{font-size:15px;font-weight:800;color:#0F172A;font-variant-numeric:tabular-nums}
+
+.third-cmp-tbl,.pck-cmp-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.third-cmp-tbl th,.third-cmp-tbl td,.pck-cmp-tbl th,.pck-cmp-tbl td{padding:9px 10px;text-align:right;font-variant-numeric:tabular-nums}
+.third-cmp-tbl th,.pck-cmp-tbl th{background:var(--panel2);color:var(--sub);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--line)}
+.third-cmp-tbl th:first-child,.pck-cmp-tbl th:first-child{text-align:left}
+.third-cmp-tbl td:first-child,.pck-cmp-tbl td:first-child{text-align:left;font-weight:700;color:#0F172A}
+.third-cmp-tbl tr.row-third{background:#F5F7FF}.third-cmp-tbl tr.row-third td:first-child{color:var(--accent)}
+.third-cmp-tbl tr.row-non,.pck-cmp-tbl tr.row-non{background:#FFFBEB}.third-cmp-tbl tr.row-non td:first-child,.pck-cmp-tbl tr.row-non td:first-child{color:var(--warn)}
+.pck-cmp-tbl tr.row-pck{background:#F0FDF4}.pck-cmp-tbl tr.row-pck td:first-child{color:var(--good)}
+.third-cmp-tbl .cell-better{color:var(--down);font-weight:800}
+.third-cmp-tbl .cell-worse{color:var(--up);font-weight:800}
+.pck-cmp-tbl .cell-better{color:var(--down);font-weight:800}
+.pck-cmp-tbl .cell-worse{color:var(--up);font-weight:800}
+
+.third-byagent-tbl,.pck-byagent-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.third-byagent-tbl th,.pck-byagent-tbl th{background:var(--panel2);color:var(--sub);font-weight:700;padding:9px 10px;text-align:right;font-size:11.5px;border-bottom:1px solid var(--line)}
+.third-byagent-tbl th:first-child,.pck-byagent-tbl th:first-child{text-align:left;width:90px}
+.third-byagent-tbl th:nth-child(2),.pck-byagent-tbl th:nth-child(2){text-align:center;width:70px}
+.third-byagent-tbl td,.pck-byagent-tbl td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+.third-byagent-tbl td:first-child,.pck-byagent-tbl td:first-child{text-align:left;font-weight:700;color:#0F172A}
+.third-byagent-tbl td:nth-child(2),.pck-byagent-tbl td:nth-child(2){text-align:center}
+.third-byagent-tbl tr:last-child td,.pck-byagent-tbl tr:last-child td{border-bottom:none}
+.third-byagent-tbl tr:hover td,.pck-byagent-tbl tr:hover td{background:#F9FAFF}
+
+.tf-third{display:inline-block;min-width:45px;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700}
+.tf-third.is-third{background:rgba(91,108,255,.10);color:#4338CA}
+.tf-third.is-non{background:rgba(245,158,11,.10);color:#B45309}
+.pf-pck{display:inline-block;min-width:45px;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700}
+.pf-pck.used{background:rgba(22,163,74,.10);color:#15803D}
+.pf-pck.unused{background:rgba(245,158,11,.10);color:#B45309}
+
+.pck-overview{background:linear-gradient(135deg,#F0FDF4 0%,#F7FEF9 100%);border:1px solid rgba(22,163,74,.2);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.pck-overview .h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--good);margin-bottom:8px}
+.pck-overview .h::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--good)}
+.pck-overview .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pck-overview .st{background:#fff;border-radius:7px;padding:8px 10px}
+.pck-overview .st .sl{color:var(--sub);font-size:10.5px;margin-bottom:2px}
+.pck-overview .st .sv{font-size:15px;font-weight:800;color:#0F172A;font-variant-numeric:tabular-nums}
+
+/* Insight */
+.insight{background:linear-gradient(135deg,#FAFBFF 0%,#F0F2FF 100%);border:1px solid rgba(91,108,255,.18);border-left:5px solid var(--accent);color:var(--txt);border-radius:12px;padding:20px 24px;box-shadow:var(--shadow-md)}
+.insight h3{color:var(--accent);font-size:17px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.insight ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.insight li{padding:12px 14px;border-radius:8px;background:#fff;border:1px solid rgba(91,108,255,.15);font-size:13px;line-height:1.7;box-shadow:0 1px 2px rgba(15,23,42,.03)}
+.insight li .ititle{display:block;color:var(--accent);font-weight:800;font-size:14px;margin-bottom:4px}
+.insight li .icontext{display:block;color:var(--txt);font-weight:500;font-size:13px}
+.insight li .isuggestion{display:block;color:var(--down);font-weight:800;font-size:13px;margin-top:4px;padding-top:4px;border-top:1px dashed rgba(220,38,38,.18)}
+
+.empty-state{text-align:center;padding:20px;color:var(--sub);font-size:12px;background:var(--panel2);border-radius:8px;border:1px dashed var(--line2);margin-top:12px}
+.empty-state .big{font-size:28px;font-weight:800;color:var(--bad);margin-bottom:4px;display:block}
+
+footer{color:var(--sub);font-size:11px;text-align:center;margin-top:40px;padding-top:16px;border-top:1px solid var(--line)}
+.note{font-size:11px;color:var(--sub2);margin-top:6px;line-height:1.5}
+.note b{color:var(--sub);font-weight:600}
+
+@media(max-width:1100px){.kpi-row.row2{grid-template-columns:repeat(3,1fr)}.kpi-row.row3{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.kpi-row.row1,.kpi-row.row2,.kpi-row.row3{grid-template-columns:repeat(2,1fr)}.pie{flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="badge">小米 · 每日投放复盘</div>
+    <h1><span>小米应用商店by 日投放看板</span></h1>
+    <div class="meta">
+      <span>数据日期：<b id="dataDate">--</b></span>
+      <span>4家代理：小牛 · 泰格 · 东信 · 盐信</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tab-nav" id="tabNav">
+    <button class="tab-btn active" data-tab="tab1">基础数据&共性问题</button>
+    <button class="tab-btn" data-tab="tab2">分代理数据展示</button>
+    <button class="tab-btn" data-tab="tab3">专项数据及分析</button>
+  </div>
+
+  <!-- ====== Page 1: 基础数据&共性问题 ====== -->
+  <div class="tab-content active" id="tab1">
+    <section>
+      <div class="sec-head"><div class="no">1</div><h2>整体大盘数据</h2></div>
+      <div class="kpi-row row1" id="kpiRow1"></div>
+      <div class="kpi-row row2" id="kpiRow2"></div>
+      <div class="kpi-row row3" id="kpiRow3"></div>
+      <div class="note">注：竞价CPM/目标出价按<b>消耗加权</b>计算；CTR/CVR按<b>曝光</b>/<b>点击</b>计算；转化成本=<b>总消耗/总转化数</b>。环比为较前日。</div>
+    </section>
+
+    <section>
+      <div class="sec-head"><div class="no">2</div><h2>共性问题</h2><p>3 家及以上代理共同存在的问题</p></div>
+      <div id="commonIssues"></div>
+      <div class="note">规则：如果某个问题在<b>3 家及以上代理</b>都出现，则归类为"共性问题"展示于此。</div>
+    </section>
+
+    <section>
+      <div class="sec-head"><div class="no">3</div><h2>综合目标拆解</h2><p>按优化目标维度汇总（不分代理）</p></div>
+      <div id="goalSummary"></div>
+      <div class="note">规则：四个优化目标的整体表现汇总。CPM/CTR/CVR/CPA 均为该目标全量广告的汇总计算。</div>
+    </section>
+  </div>
+
+  <!-- ====== Page 2: 分代理数据展示 ====== -->
+  <div class="tab-content" id="tab2">
+    <section>
+      <div class="agent-select-wrap">
+        <label>选择代理：</label>
+        <select id="agentSelect"><option value="">— 请选择 —</option></select>
+      </div>
+      <div id="singleAgentGoals"></div>
+      <div id="singleAgentFindings"></div>
+    </section>
+  </div>
+
+  <!-- ====== Page 3: 专项数据及分析 ====== -->
+  <div class="tab-content" id="tab3">
+    <section>
+      <div class="sec-head"><div class="no">1</div><h2>核心结论</h2></div>
+      <div class="insight" id="insight"></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><div class="no">2</div><h2>上游APP分析</h2></div>
+      <div class="spec-card">
+        <h3>消耗 TOP 10 上游APP</h3>
+        <div class="cs">按今日消耗降序</div>
+        <div id="appTop10"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><div class="no">3</div><h2>三方logo素材</h2></div>
+      <div class="spec-card" id="thirdSpec"></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><div class="no">4</div><h2>平台频道库</h2></div>
+      <div class="spec-card" id="pckSpec"></div>
+    </section>
+  </div>
+
+  <footer>
+    数据源：通用分析数据集 · 2026-07-22<br>
+    加权口径：消耗加权 · 环比字体涨红跌绿 · 最优指标标红加粗
+  </footer>
+</div>
+
+<script id="dataScript" type="application/json">{"date": "2026-07-22", "dateLabel": "2026-07-22", "agents": [{"id": "29950114", "short": "小牛", "full": "上海小牛畅连数字科技有限公司"}, {"id": "50564980", "short": "泰格", "full": "深圳市东信时代信息技术有限公司"}, {"id": "516046", "short": "东信", "full": "深圳市东信时代信息技术有限公司"}, {"id": "78025975", "short": "盐信", "full": "上海盐木信息技术有限公司"}], "goals": [{"id": "104", "name": "激活", "order": 1}, {"id": "204", "name": "下单", "order": 2}, {"id": "30022", "name": "关键页面访问人数", "order": 3}, {"id": "301", "name": "关键页面访问", "order": 4}], "overall": {"cost": 51338.24, "cpm": 3.91, "bid": 12.27, "ctr": 7.91, "cvr": 3.54, "cpa": 1.4, "imp": 13129124.0, "clicks": 1038325.0, "conv": 36708.0, "ads": 597.0, "creatives": 11339.0, "accounts": 86.0, "chg": {"cost": -7.68, "cpm": 1.56, "bid": 8.11, "ctr": 0.51, "cvr": 4.42, "cpa": -2.78}}, "byAgent": {"29950114": {"cost": 24424.4, "cpm": 4.56, "bid": 15.27, "ctr": 6.85, "cvr": 2.55, "cpa": 2.61, "imp": 5352451.0, "clicks": 366728.0, "conv": 9348.0, "ads": 227, "creatives": 5753, "accounts": 24, "chg": {"cost": -18.77, "cpm": 3.4, "bid": -1.29, "ctr": 5.06, "cvr": 7.14, "cpa": -8.1}}, "50564980": {"cost": 2388.18, "cpm": 4.18, "bid": 2.1, "ctr": 7.56, "cvr": 11.94, "cpa": 0.46, "imp": 571947.0, "clicks": 43234.0, "conv": 5161.0, "ads": 65, "creatives": 541, "accounts": 7, "chg": {"cost": 4.42, "cpm": -15.56, "bid": -16.0, "ctr": -9.03, "cvr": 14.37, "cpa": -19.3}}, "516046": {"cost": 13655.01, "cpm": 3.29, "bid": 1.55, "ctr": 6.7, "cvr": 4.16, "cpa": 1.18, "imp": 4149066.0, "clicks": 278177.0, "conv": 11577.0, "ads": 150, "creatives": 4253, "accounts": 13, "chg": {"cost": 37.33, "cpm": -6.8, "bid": 29.17, "ctr": 9.84, "cvr": -18.27, "cpa": 4.42}}, "78025975": {"cost": 10870.65, "cpm": 3.56, "bid": 21.21, "ctr": 11.46, "cvr": 3.03, "cpa": 1.02, "imp": 3055660.0, "clicks": 350186.0, "conv": 10622.0, "ads": 354, "creatives": 2276, "accounts": 68, "chg": {"cost": -18.33, "cpm": 15.96, "bid": 90.39, "ctr": 3.34, "cvr": -3.5, "cpa": 15.91}}}, "byAgentGoal": [{"agent_id": "29950114", "goal_id": "104", "cost": 17964.68, "cpm": 4.68, "bid": 19.96, "ctr": 6.31, "cvr": 0.38, "cpa": 19.38, "imp": 3841854.0, "clicks": 242580.0, "conv": 927.0, "ads": 74, "creatives": 2411, "accounts": 13, "chg": {"cost": -20.87, "cpm": -0.85, "bid": 5.83, "ctr": 0.48, "cvr": -2.56, "cpa": 0.99}}, {"agent_id": "29950114", "goal_id": "301", "cost": 6411.16, "cpm": 4.29, "bid": 0.75, "ctr": 8.25, "cvr": 6.83, "cpa": 0.76, "imp": 1495204.0, "clicks": 123289.0, "conv": 8421.0, "ads": 151, "creatives": 3265, "accounts": 10, "chg": {"cost": -11.06, "cpm": 17.21, "bid": 0, "ctr": 15.55, "cvr": 1.94, "cpa": -1.3}}, {"agent_id": "50564980", "goal_id": "104", "cost": 245.79, "cpm": 6.94, "bid": 15.0, "ctr": 9.01, "cvr": 0.22, "cpa": 35.11, "imp": 35434.0, "clicks": 3192.0, "conv": 7.0, "ads": 9, "creatives": 97, "accounts": 2, "chg": {"cost": -13.77, "cpm": -12.37, "bid": 0, "ctr": -6.73, "cvr": 10.0, "cpa": -13.78}}, {"agent_id": "50564980", "goal_id": "301", "cost": 2142.39, "cpm": 3.99, "bid": 0.62, "ctr": 7.46, "cvr": 12.87, "cpa": 0.42, "imp": 536513.0, "clicks": 40042.0, "conv": 5154.0, "ads": 56, "creatives": 444, "accounts": 5, "chg": {"cost": 7.01, "cpm": -14.93, "bid": -13.89, "ctr": -8.91, "cvr": 12.3, "cpa": -16.0}}, {"agent_id": "516046", "goal_id": "104", "cost": 534.82, "cpm": 5.1, "bid": 13.83, "ctr": 11.32, "cvr": 0.08, "cpa": 59.42, "imp": 104871.0, "clicks": 11869.0, "conv": 9.0, "ads": 17, "creatives": 211, "accounts": 3, "chg": {"cost": 270.32, "cpm": -13.71, "bid": 32.98, "ctr": -12.99, "cvr": -50.0, "cpa": 105.75}}, {"agent_id": "516046", "goal_id": "301", "cost": 13120.19, "cpm": 3.24, "bid": 1.05, "ctr": 6.58, "cvr": 4.34, "cpa": 1.13, "imp": 4044195.0, "clicks": 266308.0, "conv": 11568.0, "ads": 133, "creatives": 4042, "accounts": 10, "chg": {"cost": 33.9, "cpm": -7.69, "bid": -1.87, "ctr": 8.94, "cvr": -16.38, "cpa": 0.89}}, {"agent_id": "78025975", "goal_id": "301", "cost": 9161.34, "cpm": 3.51, "bid": 0.86, "ctr": 12.64, "cvr": 3.22, "cpa": 0.86, "imp": 2611860.0, "clicks": 330009.0, "conv": 10620.0, "ads": 303, "creatives": 1533, "accounts": 62, "chg": {"cost": -25.71, "cpm": 10.03, "bid": 4.88, "ctr": 4.38, "cvr": -0.31, "cpa": 4.88}}], "byGoal": {"104": {"cost": 18745.29, "cpm": 4.71, "bid": 19.72, "ctr": 6.47, "cvr": 0.37, "cpa": 19.88, "imp": 3982159.0, "clicks": 257641.0, "conv": 943.0, "ads": 81.0, "creatives": 2719.0, "accounts": 81.0, "chg": {"cost": -18.96, "cpm": -0.84, "bid": 5.12, "ctr": 2.05, "cvr": -5.13, "cpa": 2.69}, "goal_name": "激活"}, "301": {"cost": 30835.08, "cpm": 3.55, "bid": 0.9, "ctr": 8.74, "cvr": 4.71, "cpa": 0.86, "imp": 8687772.0, "clicks": 759648.0, "conv": 35763.0, "ads": 469.0, "creatives": 9284.0, "accounts": 469.0, "chg": {"cost": -1.61, "cpm": 2.6, "bid": 2.27, "ctr": -2.56, "cvr": 2.61, "cpa": 2.38}, "goal_name": "关键页面访问"}}, "goalPie": [{"name": "关键页面访问", "cost": 30835.08}, {"name": "激活", "cost": 18745.29}], "agentPie": [{"name": "小牛", "cost": 24424.4}, {"name": "东信", "cost": 13655.01}, {"name": "盐信", "cost": 10870.65}, {"name": "泰格", "cost": 2388.18}], "top10Apps": [{"cost": 18915.02, "cpm": 4.94, "bid": 23.32, "ctr": 6.93, "cvr": 0.86, "cpa": 8.34, "imp": 3826478.0, "clicks": 265071.0, "conv": 2269.0, "ads": 89, "creatives": 1854.0, "accounts": 74.0, "chg": {"cost": -16.33, "cpm": 1.44, "bid": 24.57, "ctr": 6.94, "cvr": 21.13, "cpa": -21.47}, "app": "腾讯元宝"}, {"cost": 13759.95, "cpm": 3.2, "bid": 11.34, "ctr": 6.39, "cvr": 4.07, "cpa": 1.23, "imp": 4294500.0, "clicks": 274500.0, "conv": 11172.0, "ads": 240, "creatives": 4128.0, "accounts": 208.0, "chg": {"cost": -1.67, "cpm": 5.61, "bid": 4.04, "ctr": 3.4, "cvr": -11.9, "cpa": 16.04}, "app": "千问"}, {"cost": 4608.66, "cpm": 6.46, "bid": 0.92, "ctr": 16.01, "cvr": 4.27, "cpa": 0.94, "imp": 713015.0, "clicks": 114124.0, "conv": 4877.0, "ads": 51, "creatives": 1560.0, "accounts": 44.0, "chg": {"cost": -29.08, "cpm": 35.71, "bid": 13.58, "ctr": 44.49, "cvr": -18.04, "cpa": 13.25}, "app": "悟空浏览器"}, {"cost": 3426.7, "cpm": 2.61, "bid": 0.97, "ctr": 6.07, "cvr": 4.24, "cpa": 1.02, "imp": 1312348.0, "clicks": 79594.0, "conv": 3376.0, "ads": 25, "creatives": 1390.0, "accounts": 25.0, "chg": {"cost": 174.41, "cpm": -20.43, "bid": 3.19, "ctr": 0.66, "cvr": -21.34, "cpa": 0.99}, "app": "HG"}, {"cost": 2105.38, "cpm": 4.36, "bid": 0.75, "ctr": 8.7, "cvr": 6.77, "cpa": 0.74, "imp": 482777.0, "clicks": 41993.0, "conv": 2841.0, "ads": 9, "creatives": 568.0, "accounts": 6.0, "chg": {"cost": 152.92, "cpm": -30.9, "bid": 0, "ctr": -25.45, "cvr": -1.17, "cpa": -6.33}, "app": "qianwen"}, {"cost": 1770.1, "cpm": 3.65, "bid": 0.69, "ctr": 10.53, "cvr": 5.57, "cpa": 0.62, "imp": 485205.0, "clicks": 51090.0, "conv": 2848.0, "ads": 30, "creatives": 819.0, "accounts": 18.0, "chg": {"cost": 70.13, "cpm": 34.69, "bid": 0, "ctr": 26.41, "cvr": -0.18, "cpa": 6.9}, "app": "今日头条"}, {"cost": 1536.77, "cpm": 3.41, "bid": 0.75, "ctr": 4.51, "cvr": 10.09, "cpa": 0.75, "imp": 450160.0, "clicks": 20311.0, "conv": 2049.0, "ads": 4, "creatives": 39.0, "accounts": 3.0, "chg": {"cost": 67.82, "cpm": 39.18, "bid": 0, "ctr": 37.08, "cvr": -0.79, "cpa": 2.74}, "app": "TH"}, {"cost": 877.36, "cpm": 4.56, "bid": 0.86, "ctr": 24.66, "cvr": 1.92, "cpa": 0.96, "imp": 192431.0, "clicks": 47462.0, "conv": 910.0, "ads": 40, "creatives": 199.0, "accounts": 18.0, "chg": {"cost": -47.94, "cpm": 45.22, "bid": 2.38, "ctr": 53.55, "cvr": -16.52, "cpa": 12.94}, "app": "番茄免费小说"}, {"cost": 706.74, "cpm": 3.19, "bid": 4.47, "ctr": 9.36, "cvr": 1.93, "cpa": 1.77, "imp": 221682.0, "clicks": 20746.0, "conv": 400.0, "ads": 89, "creatives": 934.0, "accounts": 57.0, "chg": {"cost": -42.76, "cpm": 10.0, "bid": 60.22, "ctr": -19.59, "cvr": -14.22, "cpa": 60.91}, "app": "红果短剧"}, {"cost": 667.23, "cpm": 2.24, "bid": 0.46, "ctr": 9.35, "cvr": 5.77, "cpa": 0.42, "imp": 297904.0, "clicks": 27841.0, "conv": 1606.0, "ads": 25, "creatives": 136.0, "accounts": 16.0, "chg": {"cost": -3.65, "cpm": -15.15, "bid": -11.54, "ctr": 25.67, "cvr": -30.9, "cpa": 0}, "app": "百度"}], "thirdAgg": {"cost": 0, "ads": 0, "creatives": 0, "accounts": 0, "cost_pct": 0, "ctr": 0, "cvr": 0, "cpa": 0, "cpm": 0}, "nonThirdAgg": {"cost": 51338.24, "cpm": 3.91, "bid": 12.27, "ctr": 7.91, "cvr": 3.54, "cpa": 1.4, "imp": 13129124.0, "clicks": 1038325.0, "conv": 36708.0, "ads": 804, "creatives": 12823, "accounts": 600, "chg": {"cost": -7.68, "cpm": 1.56, "bid": 8.11, "ctr": 0.51, "cvr": 4.42, "cpa": -2.78}, "cost_pct": 100.0}, "pckAgg": {"cost": 8933.18, "cpm": 3.14, "bid": 25.47, "ctr": 10.93, "cvr": 2.72, "cpa": 1.06, "imp": 2842577.0, "clicks": 310555.0, "conv": 8439.0, "ads": 355, "creatives": 2223, "accounts": 234.0, "chg": {"cost": -17.95, "cpm": 14.18, "bid": 92.66, "ctr": 0.83, "cvr": -5.23, "cpa": 20.45}, "cost_pct": 17.4}, "nonPckAgg": {"cost": 42405.06, "cpm": 4.12, "bid": 9.49, "ctr": 7.07, "cvr": 3.88, "cpa": 1.5, "imp": 10286547.0, "clicks": 727770.0, "conv": 28269.0, "ads": 449, "creatives": 10600, "accounts": 366.0, "chg": {"cost": -5.18, "cpm": -3.51, "bid": -12.86, "ctr": 4.74, "cvr": 4.86, "cpa": -12.28}, "cost_pct": 82.6}, "pckByAgent": {"29950114": {"pck_cost": 0, "pck_ads": 0, "non_pck_cost": 24424.4, "non_pck_ads": 227, "agent_cost": 24424.4, "pck_pct": 0}, "50564980": {"pck_cost": 0, "pck_ads": 0, "non_pck_cost": 2388.18, "non_pck_ads": 65, "agent_cost": 2388.18, "pck_pct": 0}, "516046": {"pck_cost": 0, "pck_ads": 0, "non_pck_cost": 13655.01, "non_pck_ads": 150, "agent_cost": 13655.01, "pck_pct": 0}, "78025975": {"pck_cost": 8933.18, "pck_ads": 355, "non_pck_cost": 1937.47, "non_pck_ads": 7, "agent_cost": 10870.65, "pck_pct": 82.2}}, "pckByCategory": [{"cost": 42405.06, "cpm": 4.12, "bid": 9.49, "ctr": 7.07, "cvr": 3.88, "cpa": 1.5, "imp": 10286547.0, "clicks": 727770.0, "conv": 28269.0, "ads": 449, "creatives": 10600.0, "accounts": 366.0, "chg": {"cost": -5.18, "cpm": -3.51, "bid": -12.86, "ctr": 4.74, "cvr": 4.86, "cpa": -12.28}, "category": "工具-网络工具-应用商店"}, {"cost": 999.51, "cpm": 4.65, "bid": 5.21, "ctr": 13.27, "cvr": 2.99, "cpa": 1.17, "imp": 215139.0, "clicks": 28542.0, "conv": 853.0, "ads": 2, "creatives": 64.0, "accounts": 2.0, "chg": {"cost": 869.65, "cpm": 69.09, "bid": -89.57, "ctr": 45.19, "cvr": 38.43, "cpa": -15.83}, "category": "工具-地图导航工具-车主服务-代驾"}, {"cost": 541.27, "cpm": 1.67, "bid": 28.0, "ctr": 5.66, "cvr": 2.94, "cpa": 1.0, "imp": 324998.0, "clicks": 18390.0, "conv": 540.0, "ads": 3, "creatives": 41.0, "accounts": 3.0, "chg": {"cost": 244.75, "cpm": 46.49, "bid": -37.82, "ctr": 5.01, "cvr": 102.76, "cpa": -31.03}, "category": "AI工具-一方应用-记录会议"}, {"cost": 472.38, "cpm": 2.09, "bid": 0.38, "ctr": 6.81, "cvr": 9.18, "cpa": 0.33, "imp": 225920.0, "clicks": 15386.0, "conv": 1413.0, "ads": 2, "creatives": 11.0, "accounts": 1.0, "chg": {"cost": -5.45, "cpm": -2.34, "bid": 0, "ctr": 18.85, "cvr": -18.25, "cpa": 0}, "category": "AI工具-其他-其他"}, {"cost": 467.35, "cpm": 3.12, "bid": 85.99, "ctr": 8.58, "cvr": 1.69, "cpa": 2.15, "imp": 149573.0, "clicks": 12838.0, "conv": 217.0, "ads": 6, "creatives": 46.0, "accounts": 5.0, "chg": {"cost": 179.72, "cpm": 110.81, "bid": -39.7, "ctr": 210.87, "cvr": 2716.67, "cpa": -97.43}, "category": "工具-地图导航工具-公共交通-实时公交"}, {"cost": 370.63, "cpm": 4.13, "bid": 25.5, "ctr": 10.3, "cvr": 4.48, "cpa": 0.9, "imp": 89733.0, "clicks": 9244.0, "conv": 414.0, "ads": 9, "creatives": 96.0, "accounts": 5.0, "chg": {"cost": 394.5, "cpm": 103.45, "bid": -78.1, "ctr": 312.0, "cvr": 1257.58, "cpa": -96.4}, "category": "AI工具-搜索功能-学生学习"}, {"cost": 322.78, "cpm": 8.05, "bid": 0.75, "ctr": 16.3, "cvr": 7.41, "cpa": 0.67, "imp": 40089.0, "clicks": 6534.0, "conv": 484.0, "ads": 1, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": -32.77, "cpm": -19.1, "bid": 0, "ctr": -3.26, "cvr": -12.62, "cpa": -4.29}, "category": "AI工具-AI创作-故事创作"}, {"cost": 320.12, "cpm": 11.02, "bid": 118.1, "ctr": 10.47, "cvr": 0, "cpa": 0, "imp": 29062.0, "clicks": 3044.0, "conv": 0, "ads": 4, "creatives": 28.0, "accounts": 3.0, "chg": {"cost": 6176.86, "cpm": 72.19, "bid": 16302.78, "ctr": -41.64, "cvr": -100.0, "cpa": -100.0}, "category": "AI工具-AI创作-文本创作"}, {"cost": 308.53, "cpm": 1.91, "bid": 6.17, "ctr": 7.57, "cvr": 2.62, "cpa": 0.96, "imp": 161849.0, "clicks": 12244.0, "conv": 321.0, "ads": 2, "creatives": 24.0, "accounts": 2.0, "chg": {"cost": 184.07, "cpm": -11.16, "bid": -82.05, "ctr": 26.8, "cvr": 6.94, "cpa": -34.69}, "category": "工具-学习办公工具-翻译"}, {"cost": 300.01, "cpm": 3.01, "bid": 0.42, "ctr": 11.7, "cvr": 7.72, "cpa": 0.33, "imp": 99654.0, "clicks": 11662.0, "conv": 900.0, "ads": 2, "creatives": 3.0, "accounts": 2.0, "chg": {"cost": 154.1, "cpm": -19.3, "bid": -12.5, "ctr": 11.43, "cvr": -61.78, "cpa": 83.33}, "category": "工具-学习办公工具-录音"}, {"cost": 298.16, "cpm": 4.88, "bid": 1.09, "ctr": 13.07, "cvr": 2.52, "cpa": 1.48, "imp": 61106.0, "clicks": 7987.0, "conv": 201.0, "ads": 9, "creatives": 72.0, "accounts": 6.0, "chg": {"cost": 27.8, "cpm": -13.17, "bid": 39.74, "ctr": -26.9, "cvr": 20.0, "cpa": -1.33}, "category": "工具-内容工具-小说-女生"}, {"cost": 242.58, "cpm": 9.66, "bid": 1.12, "ctr": 18.47, "cvr": 2.67, "cpa": 1.96, "imp": 25113.0, "clicks": 4638.0, "conv": 124.0, "ads": 1, "creatives": 8.0, "accounts": 1.0, "chg": {"cost": 261.84, "cpm": 41.43, "bid": 0, "ctr": 36.21, "cvr": -56.66, "cpa": 139.02}, "category": "网服-购物-剧情带货"}, {"cost": 231.63, "cpm": 2.97, "bid": 0.8, "ctr": 7.3, "cvr": 3.27, "cpa": 1.25, "imp": 77927.0, "clicks": 5688.0, "conv": 186.0, "ads": 5, "creatives": 15.0, "accounts": 4.0, "chg": {"cost": -46.51, "cpm": -4.19, "bid": -18.37, "ctr": 5.34, "cvr": -10.16, "cpa": 1.63}, "category": "网服-情感-征婚交友"}, {"cost": 214.6, "cpm": 6.43, "bid": 1.18, "ctr": 19.24, "cvr": 2.73, "cpa": 1.23, "imp": 33370.0, "clicks": 6419.0, "conv": 175.0, "ads": 9, "creatives": 26.0, "accounts": 2.0, "chg": {"cost": -63.24, "cpm": 37.98, "bid": 5.36, "ctr": 44.23, "cvr": -18.51, "cpa": 18.27}, "category": "工具-内容工具-小说-推荐"}, {"cost": 196.88, "cpm": 8.07, "bid": 0.63, "ctr": 24.78, "cvr": 4.68, "cpa": 0.7, "imp": 24410.0, "clicks": 6048.0, "conv": 283.0, "ads": 3, "creatives": 38.0, "accounts": 3.0, "chg": {"cost": 649.73, "cpm": 1.51, "bid": -17.11, "ctr": -6.46, "cvr": 155.74, "cpa": -57.32}, "category": "网服-小剧场-乡村短剧"}, {"cost": 181.39, "cpm": 2.48, "bid": 0.89, "ctr": 24.59, "cvr": 0.74, "cpa": 1.36, "imp": 73165.0, "clicks": 17991.0, "conv": 133.0, "ads": 9, "creatives": 56.0, "accounts": 6.0, "chg": {"cost": -66.51, "cpm": 45.03, "bid": 14.1, "ctr": 37.68, "cvr": -17.78, "cpa": 28.3}, "category": "内容直播-兴趣-影视音乐"}, {"cost": 167.79, "cpm": 2.25, "bid": 1.18, "ctr": 11.54, "cvr": 1.26, "cpa": 1.55, "imp": 74478.0, "clicks": 8594.0, "conv": 108.0, "ads": 2, "creatives": 20.0, "accounts": 1.0, "chg": {"cost": -36.27, "cpm": -16.36, "bid": 0.85, "ctr": -21.34, "cvr": -18.71, "cpa": 31.36}, "category": "网服-购物-购物其他"}, {"cost": 164.74, "cpm": 3.5, "bid": 25.02, "ctr": 11.35, "cvr": 2.04, "cpa": 1.51, "imp": 47095.0, "clicks": 5347.0, "conv": 109.0, "ads": 2, "creatives": 67.0, "accounts": 2.0, "chg": {"cost": 36.23, "cpm": 33.59, "bid": -59.39, "ctr": 83.36, "cvr": -1.45, "cpa": -26.34}, "category": "工具-地图导航工具-驾车-卫星求救"}, {"cost": 142.08, "cpm": 1.56, "bid": 0.8, "ctr": 4.38, "cvr": 3.66, "cpa": 0.97, "imp": 91147.0, "clicks": 3989.0, "conv": 146.0, "ads": 2, "creatives": 27.0, "accounts": 1.0, "chg": {"cost": 1854.33, "cpm": 57.58, "bid": 0, "ctr": -12.22, "cvr": -38.9, "cpa": 193.94}, "category": "AI工具-AI识图-美食健康"}, {"cost": 129.16, "cpm": 6.95, "bid": 0.66, "ctr": 23.19, "cvr": 3.53, "cpa": 0.85, "imp": 18589.0, "clicks": 4310.0, "conv": 152.0, "ads": 3, "creatives": 57.0, "accounts": 3.0, "chg": {"cost": 191.29, "cpm": -29.01, "bid": -13.16, "ctr": -25.31, "cvr": 30.74, "cpa": -27.35}, "category": "网服-小剧场-校园短剧"}, {"cost": 128.32, "cpm": 5.39, "bid": 115.3, "ctr": 5.61, "cvr": 0.15, "cpa": 64.16, "imp": 23814.0, "clicks": 1337.0, "conv": 2.0, "ads": 4, "creatives": 31.0, "accounts": 3.0, "chg": {"cost": 2325.71, "cpm": 88.46, "bid": 14312.5, "ctr": -35.44, "cvr": -75.81, "cpa": 1112.85}, "category": "AI工具-AI创作-数字人"}, {"cost": 124.51, "cpm": 1.69, "bid": 0.77, "ctr": 15.02, "cvr": 0.88, "cpa": 1.27, "imp": 73892.0, "clicks": 11098.0, "conv": 98.0, "ads": 3, "creatives": 10.0, "accounts": 2.0, "chg": {"cost": 3256.04, "cpm": -12.44, "bid": -34.19, "ctr": 99.2, "cvr": null, "cpa": null}, "category": "网服-情感-友情"}, {"cost": 121.63, "cpm": 3.26, "bid": 87.13, "ctr": 5.69, "cvr": 7.98, "cpa": 0.72, "imp": 37272.0, "clicks": 2119.0, "conv": 169.0, "ads": 7, "creatives": 53.0, "accounts": 6.0, "chg": {"cost": -81.05, "cpm": 80.11, "bid": 253.47, "ctr": -7.18, "cvr": 217.93, "cpa": -38.98}, "category": "工具-学习办公工具-文件总结"}, {"cost": 113.33, "cpm": 4.21, "bid": 0.75, "ctr": 13.07, "cvr": 2.78, "cpa": 1.16, "imp": 26947.0, "clicks": 3521.0, "conv": 98.0, "ads": 2, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": 1387.26, "cpm": -7.88, "bid": -3.85, "ctr": -30.85, "cvr": 118.9, "cpa": -39.27}, "category": "AI工具-一方应用-网页解析"}, {"cost": 111.8, "cpm": 2.31, "bid": 43.2, "ctr": 6.99, "cvr": 2.84, "cpa": 1.16, "imp": 48383.0, "clicks": 3381.0, "conv": 96.0, "ads": 5, "creatives": 75.0, "accounts": 4.0, "chg": {"cost": -31.07, "cpm": -0.86, "bid": 59.06, "ctr": -24.02, "cvr": 5.58, "cpa": 23.4}, "category": "AI工具-搜索功能-工作场景"}, {"cost": 105.02, "cpm": 3.1, "bid": 0.77, "ctr": 17.77, "cvr": 1.13, "cpa": 1.54, "imp": 33864.0, "clicks": 6016.0, "conv": 68.0, "ads": 2, "creatives": 11.0, "accounts": 2.0, "chg": {"cost": -15.23, "cpm": -54.88, "bid": 0, "ctr": -25.05, "cvr": -57.99, "cpa": 42.59}, "category": "工具-地图导航工具-车标-免费车标"}, {"cost": 101.48, "cpm": 2.81, "bid": 0.9, "ctr": 25.18, "cvr": 0.57, "cpa": 1.95, "imp": 36136.0, "clicks": 9100.0, "conv": 52.0, "ads": 2, "creatives": 16.0, "accounts": 2.0, "chg": {"cost": 260.63, "cpm": -43.69, "bid": 18.42, "ctr": 14.98, "cvr": -67.98, "cpa": 52.34}, "category": "网服-旅游-旅游资讯"}, {"cost": 96.84, "cpm": 6.82, "bid": 1.14, "ctr": 20.1, "cvr": 1.68, "cpa": 2.02, "imp": 14205.0, "clicks": 2855.0, "conv": 48.0, "ads": 2, "creatives": 20.0, "accounts": 2.0, "chg": {"cost": -55.19, "cpm": 54.65, "bid": 1.79, "ctr": 14.07, "cvr": 14.29, "cpa": 18.82}, "category": "网服-购物-其他形式带货"}, {"cost": 86.56, "cpm": 2.86, "bid": 0.77, "ctr": 22.31, "cvr": 0.8, "cpa": 1.6, "imp": 30263.0, "clicks": 6753.0, "conv": 54.0, "ads": 2, "creatives": 20.0, "accounts": 2.0, "chg": {"cost": 32.13, "cpm": -52.25, "bid": -1.28, "ctr": 6.9, "cvr": -50.62, "cpa": -9.6}, "category": "工具-地图导航工具-车标-明星"}, {"cost": 84.53, "cpm": 2.08, "bid": 0.76, "ctr": 23.56, "cvr": 0.83, "cpa": 1.06, "imp": 40710.0, "clicks": 9592.0, "conv": 80.0, "ads": 5, "creatives": 30.0, "accounts": 5.0, "chg": {"cost": 33.81, "cpm": -0.48, "bid": 22.58, "ctr": -17.65, "cvr": -23.85, "cpa": 58.21}, "category": "内容直播-生活-婚恋交友"}, {"cost": 83.77, "cpm": 3.77, "bid": 106.05, "ctr": 5.66, "cvr": 0.4, "cpa": 16.75, "imp": 22199.0, "clicks": 1257.0, "conv": 5.0, "ads": 6, "creatives": 44.0, "accounts": 4.0, "chg": {"cost": 20.41, "cpm": 49.01, "bid": 72.92, "ctr": -40.61, "cvr": -85.61, "cpa": 1663.16}, "category": "工具-学习办公工具-学术搜索"}, {"cost": 81.57, "cpm": 3.69, "bid": 45.64, "ctr": 8.75, "cvr": 2.74, "cpa": 1.54, "imp": 22132.0, "clicks": 1936.0, "conv": 53.0, "ads": 2, "creatives": 47.0, "accounts": 2.0, "chg": {"cost": -63.26, "cpm": -33.39, "bid": 618.74, "ctr": -56.42, "cvr": 15.13, "cpa": 32.76}, "category": "工具-地图导航工具-驾车-驾车巡航"}, {"cost": 80.79, "cpm": 6.4, "bid": 123.61, "ctr": 6.32, "cvr": 0, "cpa": 0, "imp": 12616.0, "clicks": 797.0, "conv": 0, "ads": 5, "creatives": 23.0, "accounts": 3.0, "chg": {"cost": 21735.14, "cpm": 24.51, "bid": 15546.84, "ctr": -43.11, "cvr": null, "cpa": null}, "category": "AI工具-一方应用-拍题搜题"}, {"cost": 76.51, "cpm": 3.46, "bid": 0.78, "ctr": 22.92, "cvr": 0.49, "cpa": 3.06, "imp": 22099.0, "clicks": 5065.0, "conv": 25.0, "ads": 3, "creatives": 29.0, "accounts": 3.0, "chg": {"cost": 36.38, "cpm": -31.21, "bid": 0, "ctr": 0.17, "cvr": -74.48, "cpa": 168.42}, "category": "工具-地图导航工具-车标-IP"}, {"cost": 73.24, "cpm": 2.21, "bid": 86.01, "ctr": 3.84, "cvr": 2.04, "cpa": 2.82, "imp": 33163.0, "clicks": 1273.0, "conv": 26.0, "ads": 6, "creatives": 79.0, "accounts": 4.0, "chg": {"cost": 70.64, "cpm": 51.37, "bid": 22.57, "ctr": 33.8, "cvr": 55.73, "cpa": -27.69}, "category": "AI工具-AI创作-音乐创作"}, {"cost": 72.5, "cpm": 2.69, "bid": 0.66, "ctr": 9.37, "cvr": 2.57, "cpa": 1.12, "imp": 26979.0, "clicks": 2527.0, "conv": 65.0, "ads": 4, "creatives": 18.0, "accounts": 3.0, "chg": {"cost": 44.62, "cpm": 53.71, "bid": -17.5, "ctr": 34.24, "cvr": -54.91, "cpa": 154.55}, "category": "工具-地图导航工具-公共交通-公交地铁"}, {"cost": 72.07, "cpm": 1.33, "bid": 0.79, "ctr": 6.33, "cvr": 1.81, "cpa": 1.16, "imp": 54275.0, "clicks": 3433.0, "conv": 62.0, "ads": 2, "creatives": 13.0, "accounts": 2.0, "chg": {"cost": -75.3, "cpm": 3.91, "bid": -1.25, "ctr": 29.71, "cvr": -52.74, "cpa": 70.59}, "category": "工具-地图导航工具-语音包-AI领航"}, {"cost": 67.52, "cpm": 12.77, "bid": 111.2, "ctr": 14.62, "cvr": 0, "cpa": 0, "imp": 5286.0, "clicks": 773.0, "conv": 0, "ads": 4, "creatives": 28.0, "accounts": 3.0, "chg": {"cost": 355.29, "cpm": 88.07, "bid": 146.07, "ctr": 12.46, "cvr": -100.0, "cpa": -100.0}, "category": "AI工具-搜索功能-生活场景"}, {"cost": 60.61, "cpm": 3.28, "bid": 116.76, "ctr": 4.42, "cvr": 1.1, "cpa": 6.73, "imp": 18473.0, "clicks": 817.0, "conv": 9.0, "ads": 8, "creatives": 50.0, "accounts": 5.0, "chg": {"cost": -85.21, "cpm": -36.06, "bid": 188.15, "ctr": -65.71, "cvr": -67.84, "cpa": 480.17}, "category": "AI工具-AI创作-视频生成"}, {"cost": 57.73, "cpm": 1.37, "bid": 107.34, "ctr": 3.85, "cvr": 0.37, "cpa": 9.62, "imp": 42204.0, "clicks": 1623.0, "conv": 6.0, "ads": 2, "creatives": 42.0, "accounts": 2.0, "chg": {"cost": -30.83, "cpm": -14.91, "bid": 10.81, "ctr": -10.88, "cvr": -62.24, "cpa": 153.83}, "category": "工具-地图导航工具-驾车-离线导航"}, {"cost": 56.86, "cpm": 10.93, "bid": 0.76, "ctr": 40.86, "cvr": 1.55, "cpa": 1.72, "imp": 5201.0, "clicks": 2125.0, "conv": 33.0, "ads": 1, "creatives": 22.0, "accounts": 1.0, "chg": {"cost": 93.4, "cpm": 130.59, "bid": 0, "ctr": 204.02, "cvr": 222.92, "cpa": -76.6}, "category": "网服-小剧场-家庭短剧"}, {"cost": 56.43, "cpm": 1.82, "bid": 0.8, "ctr": 31.28, "cvr": 0.2, "cpa": 2.97, "imp": 30988.0, "clicks": 9693.0, "conv": 19.0, "ads": 8, "creatives": 35.0, "accounts": 5.0, "chg": {"cost": -57.97, "cpm": -27.49, "bid": 14.29, "ctr": 30.88, "cvr": -82.14, "cpa": 215.96}, "category": "内容直播-兴趣-故事"}, {"cost": 54.84, "cpm": 4.94, "bid": 0.76, "ctr": 22.33, "cvr": 2.1, "cpa": 1.05, "imp": 11107.0, "clicks": 2480.0, "conv": 52.0, "ads": 2, "creatives": 34.0, "accounts": 2.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "网服-小剧场-古风短剧"}, {"cost": 54.82, "cpm": 3.58, "bid": 0.81, "ctr": 11.23, "cvr": 1.63, "cpa": 1.96, "imp": 15321.0, "clicks": 1720.0, "conv": 28.0, "ads": 5, "creatives": 32.0, "accounts": 3.0, "chg": {"cost": -85.56, "cpm": -16.74, "bid": 12.5, "ctr": -14.73, "cvr": -71.3, "cpa": 237.93}, "category": "网服-情感-陌生人社交"}, {"cost": 51.12, "cpm": 4.23, "bid": 85.98, "ctr": 9.59, "cvr": 0.17, "cpa": 25.56, "imp": 12081.0, "clicks": 1158.0, "conv": 2.0, "ads": 5, "creatives": 45.0, "accounts": 5.0, "chg": {"cost": 93.73, "cpm": 127.42, "bid": -33.59, "ctr": 205.41, "cvr": null, "cpa": null}, "category": "工具-学习办公工具-AI学习笔记"}, {"cost": 48.2, "cpm": 2.04, "bid": 111.0, "ctr": 4.53, "cvr": 0.56, "cpa": 8.03, "imp": 23577.0, "clicks": 1069.0, "conv": 6.0, "ads": 2, "creatives": 13.0, "accounts": 2.0, "chg": {"cost": 15.37, "cpm": -43.8, "bid": 66.64, "ctr": -63.02, "cvr": -28.21, "cpa": 111.32}, "category": "工具-地图导航工具-驾车-车道级领航"}, {"cost": 44.84, "cpm": 3.71, "bid": 0.78, "ctr": 27.16, "cvr": 1.37, "cpa": 1.0, "imp": 12075.0, "clicks": 3280.0, "conv": 45.0, "ads": 1, "creatives": 6.0, "accounts": 1.0, "chg": {"cost": -47.86, "cpm": -20.9, "bid": 0, "ctr": 42.27, "cvr": 14.17, "cpa": -51.22}, "category": "工具-地图导航工具-驾车-新能源导航"}, {"cost": 44.36, "cpm": 2.12, "bid": 140.0, "ctr": 2.94, "cvr": 0, "cpa": 0, "imp": 20948.0, "clicks": 615.0, "conv": 0, "ads": 1, "creatives": 5.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "AI工具-AI创作-智能画布"}, {"cost": 38.19, "cpm": 11.69, "bid": 1.17, "ctr": 21.21, "cvr": 4.62, "cpa": 1.19, "imp": 3268.0, "clicks": 693.0, "conv": 32.0, "ads": 4, "creatives": 27.0, "accounts": 2.0, "chg": {"cost": -23.22, "cpm": 219.4, "bid": 36.05, "ctr": 228.33, "cvr": 15.79, "cpa": -16.2}, "category": "工具-内容工具-短剧-短剧剧目"}, {"cost": 37.45, "cpm": 1.74, "bid": 150.0, "ctr": 2.88, "cvr": 0, "cpa": 0, "imp": 21472.0, "clicks": 618.0, "conv": 0, "ads": 2, "creatives": 20.0, "accounts": 2.0, "chg": {"cost": -15.52, "cpm": -19.44, "bid": 0, "ctr": -10.56, "cvr": null, "cpa": null}, "category": "工具-学习办公工具-学习"}, {"cost": 35.86, "cpm": 2.03, "bid": 150.0, "ctr": 3.11, "cvr": 0, "cpa": 0, "imp": 17662.0, "clicks": 550.0, "conv": 0, "ads": 2, "creatives": 13.0, "accounts": 2.0, "chg": {"cost": -40.02, "cpm": 9.73, "bid": 0, "ctr": -5.18, "cvr": null, "cpa": null}, "category": "工具-学习办公工具-扫描"}, {"cost": 31.76, "cpm": 4.07, "bid": 0.74, "ctr": 27.26, "cvr": 0.61, "cpa": 2.44, "imp": 7806.0, "clicks": 2128.0, "conv": 13.0, "ads": 3, "creatives": 23.0, "accounts": 2.0, "chg": {"cost": -44.99, "cpm": -22.92, "bid": 15.62, "ctr": -30.28, "cvr": -48.74, "cpa": 115.93}, "category": "网服-时尚-穿搭"}, {"cost": 30.92, "cpm": 2.55, "bid": 1.08, "ctr": 12.63, "cvr": 0.52, "cpa": 3.86, "imp": 12145.0, "clicks": 1534.0, "conv": 8.0, "ads": 2, "creatives": 12.0, "accounts": 2.0, "chg": {"cost": -77.96, "cpm": -37.96, "bid": 16.13, "ctr": -43.03, "cvr": -49.02, "cpa": 112.09}, "category": "网服-时尚-美甲"}, {"cost": 27.52, "cpm": 9.17, "bid": 0.98, "ctr": 16.89, "cvr": 3.16, "cpa": 1.72, "imp": 3002.0, "clicks": 507.0, "conv": 16.0, "ads": 2, "creatives": 11.0, "accounts": 2.0, "chg": {"cost": 54.52, "cpm": 3.03, "bid": -2.97, "ctr": 41.46, "cvr": -65.69, "cpa": 112.35}, "category": "工具-浏览器-游戏"}, {"cost": 25.81, "cpm": 3.3, "bid": 92.96, "ctr": 7.8, "cvr": 0.16, "cpa": 25.81, "imp": 7818.0, "clicks": 610.0, "conv": 1.0, "ads": 6, "creatives": 77.0, "accounts": 5.0, "chg": {"cost": -14.65, "cpm": 7.14, "bid": -0.25, "ctr": 73.72, "cvr": -85.84, "cpa": 326.61}, "category": "AI工具-搜索功能-人际交往"}, {"cost": 24.44, "cpm": 9.66, "bid": 1.18, "ctr": 22.3, "cvr": 1.77, "cpa": 2.44, "imp": 2529.0, "clicks": 564.0, "conv": 10.0, "ads": 4, "creatives": 14.0, "accounts": 3.0, "chg": {"cost": -92.38, "cpm": 271.54, "bid": 81.54, "ctr": 120.36, "cvr": -56.51, "cpa": 287.3}, "category": "工具-内容工具-小说-书架"}, {"cost": 22.27, "cpm": 1.73, "bid": 0.8, "ctr": 5.81, "cvr": 2.14, "cpa": 1.39, "imp": 12874.0, "clicks": 748.0, "conv": 16.0, "ads": 2, "creatives": 6.0, "accounts": 1.0, "chg": {"cost": 9.55, "cpm": -4.42, "bid": 8.11, "ctr": -52.69, "cvr": 2957.14, "cpa": -93.16}, "category": "AI工具-一方应用-AI编程"}, {"cost": 20.02, "cpm": 15.89, "bid": 1.17, "ctr": 23.33, "cvr": 12.59, "cpa": 0.54, "imp": 1260.0, "clicks": 294.0, "conv": 37.0, "ads": 5, "creatives": 24.0, "accounts": 2.0, "chg": {"cost": -92.88, "cpm": 54.27, "bid": 5.41, "ctr": 43.48, "cvr": 162.29, "cpa": -59.09}, "category": "工具-内容工具-短剧-短剧频道页"}, {"cost": 19.22, "cpm": 2.92, "bid": 1.18, "ctr": 12.66, "cvr": 0.96, "cpa": 2.4, "imp": 6589.0, "clicks": 834.0, "conv": 8.0, "ads": 1, "creatives": 12.0, "accounts": 1.0, "chg": {"cost": 28.28, "cpm": -41.01, "bid": 0, "ctr": -62.0, "cvr": 220.0, "cpa": -51.9}, "category": "网服-游戏-游戏攻略"}, {"cost": 18.59, "cpm": 2.09, "bid": 1.07, "ctr": 16.34, "cvr": 0.28, "cpa": 4.65, "imp": 8901.0, "clicks": 1454.0, "conv": 4.0, "ads": 3, "creatives": 23.0, "accounts": 3.0, "chg": {"cost": -58.62, "cpm": -44.12, "bid": 9.18, "ctr": -26.92, "cvr": -87.44, "cpa": 520.0}, "category": "网服-时尚-护肤"}, {"cost": 18.26, "cpm": 1.5, "bid": 0.71, "ctr": 6.88, "cvr": 3.46, "cpa": 0.63, "imp": 12177.0, "clicks": 838.0, "conv": 29.0, "ads": 3, "creatives": 18.0, "accounts": 3.0, "chg": {"cost": -36.29, "cpm": 56.25, "bid": -11.25, "ctr": 28.36, "cvr": 140.28, "cpa": -49.6}, "category": "工具-地图导航工具-语音包-推荐"}, {"cost": 17.28, "cpm": 1.44, "bid": 0.78, "ctr": 9.01, "cvr": 1.85, "cpa": 0.86, "imp": 12034.0, "clicks": 1084.0, "conv": 20.0, "ads": 3, "creatives": 12.0, "accounts": 3.0, "chg": {"cost": -94.16, "cpm": -66.59, "bid": 20.0, "ctr": -51.35, "cvr": -25.4, "cpa": -8.51}, "category": "工具-地图导航工具-语音包-免费"}, {"cost": 16.83, "cpm": 3.79, "bid": 0.78, "ctr": 18.3, "cvr": 1.35, "cpa": 1.53, "imp": 4436.0, "clicks": 812.0, "conv": 11.0, "ads": 2, "creatives": 12.0, "accounts": 2.0, "chg": {"cost": -71.48, "cpm": -38.87, "bid": 0, "ctr": -26.15, "cvr": -54.55, "cpa": 82.14}, "category": "工具-地图导航工具-车标-汽车品牌"}, {"cost": 16.05, "cpm": 5.52, "bid": 0.8, "ctr": 39.68, "cvr": 0.95, "cpa": 1.46, "imp": 2908.0, "clicks": 1154.0, "conv": 11.0, "ads": 7, "creatives": 41.0, "accounts": 4.0, "chg": {"cost": -79.95, "cpm": 26.61, "bid": 26.98, "ctr": 89.13, "cvr": -63.74, "cpa": 84.81}, "category": "网服-小剧场-都市短剧"}, {"cost": 15.97, "cpm": 7.56, "bid": 0.8, "ctr": 48.91, "cvr": 4.26, "cpa": 0.36, "imp": 2112.0, "clicks": 1033.0, "conv": 44.0, "ads": 2, "creatives": 14.0, "accounts": 2.0, "chg": {"cost": -92.21, "cpm": 188.55, "bid": 29.03, "ctr": 83.32, "cvr": 197.9, "cpa": -47.83}, "category": "内容直播-生活-情感互动"}, {"cost": 14.52, "cpm": 7.79, "bid": 0.38, "ctr": 28.93, "cvr": 2.04, "cpa": 1.32, "imp": 1863.0, "clicks": 539.0, "conv": 11.0, "ads": 2, "creatives": 6.0, "accounts": 1.0, "chg": {"cost": 152.96, "cpm": 176.24, "bid": -52.5, "ctr": 98.15, "cvr": 101.98, "cpa": -30.89}, "category": "AI工具-AI识图-物件识别"}, {"cost": 13.73, "cpm": 3.31, "bid": 0.76, "ctr": 26.46, "cvr": 0.46, "cpa": 2.75, "imp": 4146.0, "clicks": 1097.0, "conv": 5.0, "ads": 1, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "网服-旅游-旅途风光"}, {"cost": 13.71, "cpm": 9.18, "bid": 1.06, "ctr": 22.04, "cvr": 1.52, "cpa": 2.74, "imp": 1493.0, "clicks": 329.0, "conv": 5.0, "ads": 2, "creatives": 7.0, "accounts": 1.0, "chg": {"cost": 886.33, "cpm": -10.18, "bid": 0, "ctr": 49.83, "cvr": -92.4, "cpa": 682.86}, "category": "工具-浏览器-娱乐"}, {"cost": 13.26, "cpm": 2.09, "bid": 0.8, "ctr": 10.72, "cvr": 3.37, "cpa": 0.58, "imp": 6359.0, "clicks": 682.0, "conv": 23.0, "ads": 1, "creatives": 11.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "工具-地图导航工具-语音包-IP"}, {"cost": 12.86, "cpm": 17.59, "bid": 0.95, "ctr": 42.95, "cvr": 11.15, "cpa": 0.37, "imp": 731.0, "clicks": 314.0, "conv": 35.0, "ads": 6, "creatives": 17.0, "accounts": 3.0, "chg": {"cost": -94.34, "cpm": 216.37, "bid": 48.44, "ctr": 155.96, "cvr": 60.66, "cpa": -22.92}, "category": "网服-小说-男频小说"}, {"cost": 11.82, "cpm": 1.66, "bid": 0.38, "ctr": 6.38, "cvr": 2.87, "cpa": 0.91, "imp": 7101.0, "clicks": 453.0, "conv": 13.0, "ads": 1, "creatives": 8.0, "accounts": 1.0, "chg": {"cost": 4825.0, "cpm": -50.89, "bid": 0, "ctr": -43.39, "cvr": -77.04, "cpa": 279.17}, "category": "AI工具-AI识图-翻译"}, {"cost": 11.42, "cpm": 2.22, "bid": 17.79, "ctr": 5.8, "cvr": 1.68, "cpa": 2.28, "imp": 5141.0, "clicks": 298.0, "conv": 5.0, "ads": 3, "creatives": 27.0, "accounts": 2.0, "chg": {"cost": 42.57, "cpm": 7.77, "bid": 2370.83, "ctr": -9.66, "cvr": -16.42, "cpa": 42.5}, "category": "AI工具-一方应用-音乐音频"}, {"cost": 11.21, "cpm": 1.88, "bid": 1.18, "ctr": 5.78, "cvr": 1.16, "cpa": 2.8, "imp": 5964.0, "clicks": 345.0, "conv": 4.0, "ads": 1, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": -17.82, "cpm": -14.93, "bid": 0, "ctr": -1.7, "cvr": -73.7, "cpa": 229.41}, "category": "网服-情感-亲情"}, {"cost": 10.9, "cpm": 4.09, "bid": 1.08, "ctr": 9.63, "cvr": 1.95, "cpa": 2.18, "imp": 2668.0, "clicks": 257.0, "conv": 5.0, "ads": 3, "creatives": 14.0, "accounts": 2.0, "chg": {"cost": -89.56, "cpm": -32.62, "bid": 6.93, "ctr": -47.09, "cvr": -6.25, "cpa": 35.4}, "category": "工具-内容工具-音乐"}, {"cost": 10.61, "cpm": 1.88, "bid": 0.61, "ctr": 5.5, "cvr": 0.65, "cpa": 5.3, "imp": 5640.0, "clicks": 310.0, "conv": 2.0, "ads": 3, "creatives": 17.0, "accounts": 2.0, "chg": {"cost": 95.76, "cpm": -1.05, "bid": -22.78, "ctr": -12.28, "cvr": -83.38, "cpa": 588.31}, "category": "AI工具-一方应用-AIPPT"}, {"cost": 10.39, "cpm": 2.54, "bid": 0.8, "ctr": 13.66, "cvr": 1.08, "cpa": 1.73, "imp": 4084.0, "clicks": 558.0, "conv": 6.0, "ads": 1, "creatives": 6.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "工具-地图导航工具-语音包-达人"}, {"cost": 10.36, "cpm": 2.62, "bid": 0.59, "ctr": 5.93, "cvr": 2.55, "cpa": 1.73, "imp": 3961.0, "clicks": 235.0, "conv": 6.0, "ads": 2, "creatives": 19.0, "accounts": 2.0, "chg": {"cost": 93.64, "cpm": 1.16, "bid": -26.25, "ctr": -18.21, "cvr": null, "cpa": null}, "category": "AI工具-一方应用-数据分析"}, {"cost": 9.88, "cpm": 1.43, "bid": 1.05, "ctr": 7.53, "cvr": 0.19, "cpa": 9.88, "imp": 6917.0, "clicks": 521.0, "conv": 1.0, "ads": 4, "creatives": 24.0, "accounts": 3.0, "chg": {"cost": -64.29, "cpm": -5.3, "bid": 16.67, "ctr": 42.08, "cvr": -86.81, "cpa": 398.99}, "category": "网服-情感-爱情"}, {"cost": 9.84, "cpm": 1.23, "bid": 0.8, "ctr": 7.96, "cvr": 4.25, "cpa": 0.36, "imp": 7992.0, "clicks": 636.0, "conv": 27.0, "ads": 1, "creatives": 6.0, "accounts": 1.0, "chg": {"cost": -93.38, "cpm": -2.38, "bid": 0, "ctr": 25.16, "cvr": 91.44, "cpa": -60.0}, "category": "工具-地图导航工具-语音包-精选"}, {"cost": 7.54, "cpm": 1.5, "bid": 0.8, "ctr": 4.9, "cvr": 6.88, "cpa": 0.44, "imp": 5042.0, "clicks": 247.0, "conv": 17.0, "ads": 2, "creatives": 7.0, "accounts": 1.0, "chg": {"cost": -96.53, "cpm": -1.96, "bid": -84.91, "ctr": -21.97, "cvr": 185.48, "cpa": -56.44}, "category": "工具-学习办公工具-解题"}, {"cost": 7.5, "cpm": 4.84, "bid": 0.76, "ctr": 27.18, "cvr": 2.38, "cpa": 0.75, "imp": 1549.0, "clicks": 421.0, "conv": 10.0, "ads": 1, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "网服-旅游-景点介绍"}, {"cost": 7.46, "cpm": 19.08, "bid": 1.18, "ctr": 40.66, "cvr": 1.26, "cpa": 3.73, "imp": 391.0, "clicks": 159.0, "conv": 2.0, "ads": 4, "creatives": 9.0, "accounts": 2.0, "chg": {"cost": 400.67, "cpm": 326.85, "bid": 7.27, "ctr": 146.13, "cvr": -30.77, "cpa": 150.34}, "category": "工具-内容工具-小说-热门"}, {"cost": 7.09, "cpm": 10.03, "bid": 1.17, "ctr": 20.23, "cvr": 0, "cpa": 0, "imp": 707.0, "clicks": 143.0, "conv": 0, "ads": 5, "creatives": 8.0, "accounts": 2.0, "chg": {"cost": -58.71, "cpm": 93.26, "bid": -0.85, "ctr": 6.7, "cvr": -100.0, "cpa": -100.0}, "category": "工具-内容工具-小说-有声"}, {"cost": 6.32, "cpm": 2.33, "bid": 0.75, "ctr": 10.99, "cvr": 3.69, "cpa": 0.57, "imp": 2712.0, "clicks": 298.0, "conv": 11.0, "ads": 3, "creatives": 8.0, "accounts": 2.0, "chg": {"cost": 41.07, "cpm": 70.07, "bid": 4.17, "ctr": -23.73, "cvr": 190.55, "cpa": -24.0}, "category": "AI工具-一方应用-新闻推送"}, {"cost": 6.24, "cpm": 4.65, "bid": 0.78, "ctr": 12.16, "cvr": 0, "cpa": 0, "imp": 1341.0, "clicks": 163.0, "conv": 0, "ads": 1, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": 80.35, "cpm": -16.37, "bid": 0, "ctr": -41.37, "cvr": null, "cpa": null}, "category": "工具-浏览器-生活攻略-情感"}, {"cost": 5.27, "cpm": 4.87, "bid": 0.62, "ctr": 12.75, "cvr": 3.62, "cpa": 1.05, "imp": 1082.0, "clicks": 138.0, "conv": 5.0, "ads": 4, "creatives": 9.0, "accounts": 2.0, "chg": {"cost": -97.77, "cpm": 28.5, "bid": -4.62, "ctr": 31.44, "cvr": -38.33, "cpa": 56.72}, "category": "网服-美食-美食记录"}, {"cost": 5.04, "cpm": 1.7, "bid": 0.8, "ctr": 5.4, "cvr": 0, "cpa": 0, "imp": 2965.0, "clicks": 160.0, "conv": 0, "ads": 1, "creatives": 13.0, "accounts": 1.0, "chg": {"cost": -60.19, "cpm": 14.09, "bid": 0, "ctr": -24.26, "cvr": -100.0, "cpa": -100.0}, "category": "AI工具-一方应用-语音通话"}, {"cost": 4.99, "cpm": 3.84, "bid": 1.18, "ctr": 15.99, "cvr": 2.88, "cpa": 0.83, "imp": 1301.0, "clicks": 208.0, "conv": 6.0, "ads": 1, "creatives": 8.0, "accounts": 1.0, "chg": {"cost": -89.72, "cpm": 43.82, "bid": 0, "ctr": -36.97, "cvr": 343.08, "cpa": -48.77}, "category": "网服-购物-达人带货"}, {"cost": 3.28, "cpm": 2.06, "bid": 150.0, "ctr": 2.39, "cvr": 0, "cpa": 0, "imp": 1589.0, "clicks": 38.0, "conv": 0, "ads": 2, "creatives": 8.0, "accounts": 1.0, "chg": {"cost": -83.61, "cpm": 19.08, "bid": 116.61, "ctr": -59.01, "cvr": -100.0, "cpa": -100.0}, "category": "工具-学习办公工具-日报"}, {"cost": 2.97, "cpm": 3.75, "bid": 1.11, "ctr": 7.95, "cvr": 11.11, "cpa": 0.42, "imp": 792.0, "clicks": 63.0, "conv": 7.0, "ads": 6, "creatives": 30.0, "accounts": 4.0, "chg": {"cost": -94.97, "cpm": 17.19, "bid": 7.77, "ctr": -36.35, "cvr": 434.13, "cpa": -65.85}, "category": "工具-内容工具-小说-出版物"}, {"cost": 1.44, "cpm": 11.43, "bid": 0.62, "ctr": 42.86, "cvr": 0, "cpa": 0, "imp": 126.0, "clicks": 54.0, "conv": 0, "ads": 1, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "内容直播-娱乐-闲聊互动"}, {"cost": 1.28, "cpm": 2.03, "bid": 1.06, "ctr": 8.57, "cvr": 0, "cpa": 0, "imp": 630.0, "clicks": 54.0, "conv": 0, "ads": 4, "creatives": 10.0, "accounts": 3.0, "chg": {"cost": -82.27, "cpm": -25.91, "bid": 45.21, "ctr": -24.43, "cvr": -100.0, "cpa": -100.0}, "category": "工具-存储工具-同步空间"}, {"cost": 1.19, "cpm": 4.82, "bid": 1.16, "ctr": 6.07, "cvr": 0, "cpa": 0, "imp": 247.0, "clicks": 15.0, "conv": 0, "ads": 4, "creatives": 14.0, "accounts": 2.0, "chg": {"cost": -80.62, "cpm": -19.4, "bid": 0.87, "ctr": -49.79, "cvr": -100.0, "cpa": -100.0}, "category": "工具-内容工具-影视动漫"}, {"cost": 0.85, "cpm": 6.34, "bid": 1.12, "ctr": 25.37, "cvr": 0, "cpa": 0, "imp": 134.0, "clicks": 34.0, "conv": 0, "ads": 1, "creatives": 6.0, "accounts": 1.0, "chg": {"cost": -99.61, "cpm": 23.11, "bid": 0, "ctr": 39.78, "cvr": -100.0, "cpa": -100.0}, "category": "网服-购物-店铺卖货"}, {"cost": 0.14, "cpm": 0.98, "bid": 0.63, "ctr": 5.59, "cvr": 75.0, "cpa": 0.02, "imp": 143.0, "clicks": 8.0, "conv": 6.0, "ads": 3, "creatives": 4.0, "accounts": 2.0, "chg": {"cost": -99.12, "cpm": -60.8, "bid": -10.0, "ctr": -20.93, "cvr": 2311.58, "cpa": -98.25}, "category": "内容直播-资讯-科技"}, {"cost": 0.05, "cpm": 2.08, "bid": 0.75, "ctr": 25.0, "cvr": 0, "cpa": 0, "imp": 24.0, "clicks": 6.0, "conv": 0, "ads": 10, "creatives": 4.0, "accounts": 1.0, "chg": {"cost": -99.48, "cpm": -26.24, "bid": -23.47, "ctr": -4.98, "cvr": -100.0, "cpa": -100.0}, "category": "工具-内容工具-小说-男生"}, {"cost": 0.05, "cpm": 2.08, "bid": 0.72, "ctr": 12.5, "cvr": 200.0, "cpa": 0.01, "imp": 24.0, "clicks": 3.0, "conv": 6.0, "ads": 3, "creatives": 3.0, "accounts": 1.0, "chg": {"cost": -99.89, "cpm": -16.13, "bid": 1.41, "ctr": 20.66, "cvr": 11073.18, "cpa": -99.25}, "category": "网服-美食-美食测评"}, {"cost": 0.04, "cpm": 1.11, "bid": 0.8, "ctr": 5.56, "cvr": 0, "cpa": 0, "imp": 36.0, "clicks": 2.0, "conv": 0, "ads": 2, "creatives": 2.0, "accounts": 1.0, "chg": {"cost": -99.98, "cpm": -35.09, "bid": 0, "ctr": -19.3, "cvr": -100.0, "cpa": -100.0}, "category": "网服-搞笑-搞笑段子"}, {"cost": 0.03, "cpm": 0.83, "bid": 0.68, "ctr": 0, "cvr": 0, "cpa": 0.03, "imp": 36.0, "clicks": 0, "conv": 1.0, "ads": 5, "creatives": 4.0, "accounts": 2.0, "chg": {"cost": -99.96, "cpm": -82.34, "bid": 1.49, "ctr": -100.0, "cvr": -100.0, "cpa": -92.86}, "category": "网服-美食-美食探店"}, {"cost": 0.03, "cpm": 30.0, "bid": 0.62, "ctr": 100.0, "cvr": 0, "cpa": 0, "imp": 1.0, "clicks": 1.0, "conv": 0, "ads": 3, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": 50.0, "cpm": 2602.7, "bid": -22.5, "ctr": null, "cvr": null, "cpa": null}, "category": "网服-美食-美食制作"}, {"cost": 0.01, "cpm": 10.0, "bid": 0.72, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 1.0, "clicks": 0, "conv": 0, "ads": 3, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": -94.44, "cpm": 27.71, "bid": -7.69, "ctr": -100.0, "cvr": null, "cpa": null}, "category": "网服-美食-饮食文化"}, {"cost": 0.01, "cpm": 2.0, "bid": 0.8, "ctr": 40.0, "cvr": 0, "cpa": 0, "imp": 5.0, "clicks": 2.0, "conv": 0, "ads": 1, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": -99.89, "cpm": -47.09, "bid": 0, "ctr": 91.75, "cvr": -100.0, "cpa": -100.0}, "category": "网服-时尚-美妆"}, {"cost": 0.01, "cpm": 1.25, "bid": 0.62, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 8.0, "clicks": 0, "conv": 0, "ads": 5, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": -99.96, "cpm": -52.47, "bid": -7.46, "ctr": -100.0, "cvr": -100.0, "cpa": -100.0}, "category": "网服-美食-美食其他"}, {"cost": 0.01, "cpm": 10.0, "bid": 0.8, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 1.0, "clicks": 0, "conv": 0, "ads": 3, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": -66.67, "cpm": 1983.33, "bid": 0, "ctr": -100.0, "cvr": null, "cpa": null}, "category": "网服-小说-女频小说"}, {"cost": 0.01, "cpm": 1.11, "bid": 0.76, "ctr": 11.11, "cvr": 0, "cpa": 0, "imp": 9.0, "clicks": 1.0, "conv": 0, "ads": 1, "creatives": 1.0, "accounts": 1.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": null, "cvr": null, "cpa": null}, "category": "0"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 1, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": -100.0, "cvr": null, "cpa": null}, "category": "工具-浏览器-AI Agent"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 1, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": -100.0, "cpm": -100.0, "bid": -100.0, "ctr": -100.0, "cvr": null, "cpa": null}, "category": "工具-浏览器-生活攻略-法律"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 1, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": null, "cpm": null, "bid": null, "ctr": -100.0, "cvr": null, "cpa": null}, "category": "工具-浏览器-生活攻略-时尚"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 3, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": -100.0, "cpm": -100.0, "bid": -100.0, "ctr": -100.0, "cvr": -100.0, "cpa": -100.0}, "category": "工具-浏览器-生活攻略-旅游"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 1.0, "clicks": 0, "conv": 0, "ads": 3, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": -100.0, "cpm": -100.0, "bid": -100.0, "ctr": -100.0, "cvr": -100.0, "cpa": -100.0}, "category": "工具-存储工具-相册备份"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 2, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": -100.0, "cpm": -100.0, "bid": -100.0, "ctr": -100.0, "cvr": -100.0, "cpa": -100.0}, "category": "AI工具-AI识图-娱乐社交"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 2, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": -100.0, "cpm": -100.0, "bid": -100.0, "ctr": -100.0, "cvr": -100.0, "cpa": -100.0}, "category": "AI工具-一方应用-录音理解"}, {"cost": 0, "cpm": 0, "bid": 0, "ctr": 0, "cvr": 0, "cpa": 0, "imp": 0, "clicks": 0, "conv": 0, "ads": 2, "creatives": 0.0, "accounts": 0.0, "chg": {"cost": -100.0, "cpm": -100.0, "bid": -100.0, "ctr": -100.0, "cvr": -100.0, "cpa": -100.0}, "category": "工具-浏览器-网赚"}], "thirdByAgent": [{"agent_id": "29950114", "agent_short": "小牛", "is_third": false, "is_third_label": "非三方", "cost": 24424.4, "ctr": 6.85, "accounts": 151, "ads": 227, "creatives": 5753, "cost_pct": 47.6}, {"agent_id": "50564980", "agent_short": "泰格", "is_third": false, "is_third_label": "非三方", "cost": 2388.18, "ctr": 7.56, "accounts": 61, "ads": 65, "creatives": 541, "cost_pct": 4.7}, {"agent_id": "516046", "agent_short": "东信", "is_third": false, "is_third_label": "非三方", "cost": 13655.01, "ctr": 6.7, "accounts": 148, "ads": 150, "creatives": 4253, "cost_pct": 26.6}, {"agent_id": "78025975", "agent_short": "盐信", "is_third": false, "is_third_label": "非三方", "cost": 10870.65, "ctr": 11.46, "accounts": 240, "ads": 362, "creatives": 2276, "cost_pct": 21.2}], "pckByAgentFull": [{"agent_id": "29950114", "agent_short": "小牛", "is_pck": false, "is_pck_label": "未使用", "cost": 24424.4, "ctr": 6.85, "accounts": 151, "ads": 227, "creatives": 5753, "cost_pct": 47.6}, {"agent_id": "50564980", "agent_short": "泰格", "is_pck": false, "is_pck_label": "未使用", "cost": 2388.18, "ctr": 7.56, "accounts": 61, "ads": 65, "creatives": 541, "cost_pct": 4.7}, {"agent_id": "516046", "agent_short": "东信", "is_pck": false, "is_pck_label": "未使用", "cost": 13655.01, "ctr": 6.7, "accounts": 148, "ads": 150, "creatives": 4253, "cost_pct": 26.6}, {"agent_id": "78025975", "agent_short": "盐信", "is_pck": true, "is_pck_label": "使用", "cost": 8933.18, "ctr": 10.93, "accounts": 234, "ads": 355, "creatives": 2223, "cost_pct": 17.4}, {"agent_id": "78025975", "agent_short": "盐信", "is_pck": false, "is_pck_label": "未使用", "cost": 1937.47, "ctr": 18.6, "accounts": 6, "ads": 7, "creatives": 53, "cost_pct": 3.8}], "findings": [{"agent": {"id": "29950114", "short": "小牛", "full": "上海小牛畅连数字科技有限公司"}, "findings": [{"tag": "平台频道库未充分使用", "kind": "high", "finding": "平台频道库消耗占比 0%（0 条广告 / ¥0），平台频道库应用不足，未做分品类人群沉淀。", "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。"}, {"tag": "三方 logo 占比偏低", "kind": "high", "finding": "当前无三方logo素材，占比 0%（0条/227条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。"}]}, {"agent": {"id": "50564980", "short": "泰格", "full": "深圳市东信时代信息技术有限公司"}, "findings": [{"tag": "广均创意数不足", "kind": "high", "finding": "当前 65 条广告仅搭配 541 条有消耗创意，广均 8.3 条，未达到 10 条标准（需补足约 108 条创意）。", "solution": "1) 推动代理为每条广告配置 10+ 条有消耗创意；2) 重点补充当前表现好的 TOP 广告的创意数量；3) 建议创意团队增加 A/B 测试版本，提升创意多样性。"}, {"tag": "平台频道库未充分使用", "kind": "high", "finding": "平台频道库消耗占比 0%（0 条广告 / ¥0），平台频道库应用不足，未做分品类人群沉淀。", "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。"}, {"tag": "三方 logo 占比偏低", "kind": "high", "finding": "当前无三方logo素材，占比 0%（0条/65条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。"}, {"tag": "整体 CTR 下降", "kind": "mid", "finding": "整体 CTR 7.56%，环比 -9.0%，点击率走弱。当前 CTR 7.56%，低于大盘 7.91%。", "solution": "1) 排查近 7 天新上素材的点击表现；2) 加大三方logo素材应用（三方 CTR 普遍高于非三方）；3) 优化文案与外层样式。"}, {"tag": "横向 CVR 偏低", "kind": "mid", "finding": "泰格在「激活」目标 CVR 0.22%，低于大盘（激活大盘）0.37% 的 70%（落后 41%）。", "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。"}, {"tag": "横向 CPA 偏高", "kind": "mid", "finding": "泰格在「激活」目标转化成本 ¥35.1100，高于大盘（激活大盘）¥19.8800 的 77%。", "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。"}]}, {"agent": {"id": "516046", "short": "东信", "full": "深圳市东信时代信息技术有限公司"}, "findings": [{"tag": "整体 CVR 下降", "kind": "high", "finding": "整体 CVR 4.16%，环比 -18.3%，转化效率明显下滑。其中「激活」目标下 CVR 表现最弱（0.08%）。当前 CVR 4.16%，高于大盘 3.54%。", "solution": "1) 重点排查「激活」目标下的转化链路与素材质量；2) 调低低质创意的预算上限，倾斜给高 CVR 广告；3) 适当调降目标出价，避免高价低质流量涌入。"}, {"tag": "平台频道库未充分使用", "kind": "high", "finding": "平台频道库消耗占比 0%（0 条广告 / ¥0），平台频道库应用不足，未做分品类人群沉淀。", "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。"}, {"tag": "三方 logo 占比偏低", "kind": "high", "finding": "当前无三方logo素材，占比 0%（0条/150条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。"}, {"tag": "横向 CVR 偏低", "kind": "mid", "finding": "东信在「激活」目标 CVR 0.08%，低于大盘（激活大盘）0.37% 的 70%（落后 78%）。", "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。"}, {"tag": "横向 CPA 偏高", "kind": "mid", "finding": "东信在「激活」目标转化成本 ¥59.4200，高于大盘（激活大盘）¥19.8800 的 199%。", "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。"}, {"tag": "横向 CPA 偏高", "kind": "mid", "finding": "东信在「关键页面访问」目标转化成本 ¥1.1300，高于大盘（关键页面访问大盘）¥0.8600 的 31%。", "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。"}]}, {"agent": {"id": "78025975", "short": "盐信", "full": "上海盐木信息技术有限公司"}, "findings": [{"tag": "广均创意数不足", "kind": "high", "finding": "当前 354 条广告仅搭配 2276 条有消耗创意，广均 6.4 条，未达到 10 条标准（需补足约 1264 条创意）。", "solution": "1) 推动代理为每条广告配置 10+ 条有消耗创意；2) 重点补充当前表现好的 TOP 广告的创意数量；3) 建议创意团队增加 A/B 测试版本，提升创意多样性。"}, {"tag": "整体 CPA 上升", "kind": "high", "finding": "整体转化成本 ¥1.0200，环比 +15.9%，成本承压。其中「关键页面访问」目标下转化成本最高（¥0.8600）。当前 CPA ¥1.0200，低于大盘 ¥1.4000。", "solution": "1) 重点优化「关键页面访问」目标的出价结构与素材；2) 对 CVR 高的广告提高出价上限，CVR 低的降出价；3) 排查高消耗低转化广告的素材质量与定向；4) 增加三方logo素材应用。"}, {"tag": "三方 logo 占比偏低", "kind": "high", "finding": "当前无三方logo素材，占比 0%（0条/354条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。"}, {"tag": "横向 CVR 偏低", "kind": "mid", "finding": "盐信在「关键页面访问」目标 CVR 3.22%，低于大盘（关键页面访问大盘）4.71% 的 70%（落后 32%）。", "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。"}]}], "insight": [{"title": "① 加大上游APP表现好的APP的消耗", "context": "今日 TOP 3 上游APP（腾讯元宝、千问、悟空浏览器）合计消耗 ¥3.73万（占大盘 72.6%）。其中 腾讯元宝 消耗 ¥1.89万，CTR 6.9%，CPA ¥8.3400。", "suggestion": "建议在全部 4 家代理中加大预算倾斜，并推动新 APP 进入合作清单。"}, {"title": "② 推动客户持续加大三方logo素材的应用", "context": "今日三方logo素材消耗占比仅 0.0%（0条），但 CTR 达 0.00%（高于非三方 -7.91 个百分点）。TOP 3 高消耗APP（腾讯元宝、千问、悟空浏览器）是三方扩容的核心目标。", "suggestion": "建议持续加大三方logo素材应用比例；并针对 TOP 3 高消耗APP（腾讯元宝、千问、悟空浏览器）优先测试三方logo版本，提升点击效率。"}, {"title": "③ 推动客户使用平台频道库", "context": "今日平台频道库消耗占比 17.4%（355 条广告 / ¥8,933），尚未充分发挥分品类人群沉淀的作用。", "suggestion": "建议继续扩大平台频道库应用比例，将高消耗的长尾上游 APP 拆分到对应类目，提升整体转化效率。"}], "common_issues": [{"tag": "平台频道库未充分使用", "kind": "high", "agents": [{"agent": "小牛", "finding": "平台频道库消耗占比 0%（0 条广告 / ¥0），平台频道库应用不足，未做分品类人群沉淀。", "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。", "kind": "high"}, {"agent": "泰格", "finding": "平台频道库消耗占比 0%（0 条广告 / ¥0），平台频道库应用不足，未做分品类人群沉淀。", "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。", "kind": "high"}, {"agent": "东信", "finding": "平台频道库消耗占比 0%（0 条广告 / ¥0），平台频道库应用不足，未做分品类人群沉淀。", "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。", "kind": "high"}], "solution": "1) 推动客户启用平台频道库做分品类人群沉淀；2) 避免因同营销对象多样性过高被系统过滤；3) 持续优化人群标签精度，提升转化效率。"}, {"tag": "三方 logo 占比偏低", "kind": "high", "agents": [{"agent": "小牛", "finding": "当前无三方logo素材，占比 0%（0条/227条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。", "kind": "high"}, {"agent": "泰格", "finding": "当前无三方logo素材，占比 0%（0条/65条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。", "kind": "high"}, {"agent": "东信", "finding": "当前无三方logo素材，占比 0%（0条/150条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。", "kind": "high"}, {"agent": "盐信", "finding": "当前无三方logo素材，占比 0%（0条/354条），缺少三方素材投放能力。", "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。", "kind": "high"}], "solution": "1) 从 TOP 3 APP（腾讯元宝、千问、悟空浏览器）开始试点引入三方logo素材，确保素材质量后再放量；2) 避免一上来大量铺开低质三方素材，先做小范围测试验证 CTR；3) 与素材方协调首批三方素材适配。"}, {"tag": "横向 CVR 偏低", "kind": "mid", "agents": [{"agent": "泰格", "finding": "泰格在「激活」目标 CVR 0.22%，低于大盘（激活大盘）0.37% 的 70%（落后 41%）。", "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。", "kind": "mid"}, {"agent": "东信", "finding": "东信在「激活」目标 CVR 0.08%，低于大盘（激活大盘）0.37% 的 70%（落后 78%）。", "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。", "kind": "mid"}, {"agent": "盐信", "finding": "盐信在「关键页面访问」目标 CVR 3.22%，低于大盘（关键页面访问大盘）4.71% 的 70%（落后 32%）。", "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。", "kind": "mid"}], "solution": "1) 复盘该代理在此目标下的转化目标匹配度；2) 减少低 CVR 广告预算，重投大盘高 CVR 目标；3) 排查转化漏斗。"}, {"tag": "横向 CPA 偏高", "kind": "mid", "agents": [{"agent": "泰格", "finding": "泰格在「激活」目标转化成本 ¥35.1100，高于大盘（激活大盘）¥19.8800 的 77%。", "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。", "kind": "mid"}, {"agent": "东信", "finding": "东信在「激活」目标转化成本 ¥59.4200，高于大盘（激活大盘）¥19.8800 的 199%。", "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。", "kind": "mid"}, {"agent": "东信", "finding": "东信在「关键页面访问」目标转化成本 ¥1.1300，高于大盘（关键页面访问大盘）¥0.8600 的 31%。", "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。", "kind": "mid"}], "solution": "1) 优化该代理在此目标下的出价结构，提高高 CVR 广告出价上限；2) 减少低质广告预算占比；3) 加大三方logo素材应用。"}]}</script>
+<script>
+(function(){
+'use strict';
+const DATA = JSON.parse(document.getElementById('dataScript').textContent);
+
+// ---- Utils ----
+const GOAL_COLORS = {'104':'#5B6CFF','204':'#16A34A','30022':'#F59E0B','301':'#EC4899'};
+const AGENT_COLORS = ['#5B6CFF','#16A34A','#F59E0B','#EC4899'];
+const fmt = {
+  money:function(v){if(v==null)return'—';if(Math.abs(v)>=10000)return'¥'+(v/10000).toFixed(2)+'万';if(Math.abs(v)>=1000)return'¥'+v.toFixed(0);return'¥'+v.toFixed(2)},
+  moneyW:function(v){if(v==null)return'—';return'¥'+(v/10000).toFixed(2)+'万'},
+  money2:function(v){if(v==null)return'—';return'¥'+v.toFixed(2)},
+  pct:function(v,d){d=d||2;if(v==null)return'—';return v.toFixed(d)+'%'},
+  int:function(v){if(v==null)return'—';return Math.round(v).toLocaleString()},
+  chgFont:function(v,d){d=d||1;if(v==null)return'<span class="chg-flat">—</span>';if(v===0)return'<span class="chg-flat">0.0%</span>';var up=v>0;var arrow=up?'▲':'▼';var cls=up?'chg-up':'chg-down';return '<span class="'+cls+'">'+arrow+Math.abs(v).toFixed(d)+'%</span>'}
+};
+
+// ---- Pie chart ----
+function pieSvg(items, diameter){
+  var d=diameter,cx=d/2,cy=d/2,r=d*0.42;
+  var total=items.reduce(function(s,i){return s+i.value},0);
+  if(total===0)return'<svg width="'+d+'" height="'+d+'"></svg>';
+  var acc=0;
+  var arcs=items.map(function(i){
+    var start=acc/total*Math.PI*2-Math.PI/2;
+    acc+=i.value;
+    var end=acc/total*Math.PI*2-Math.PI/2;
+    if(items.length===1)return'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+i.color+'"/>';
+    var large=(end-start)>Math.PI?1:0;
+    var x1=cx+r*Math.cos(start),y1=cy+r*Math.sin(start);
+    var x2=cx+r*Math.cos(end),y2=cy+r*Math.sin(end);
+    return'<path d="M'+cx+','+cy+' L'+x1.toFixed(2)+','+y1.toFixed(2)+' A'+r+','+r+' 0 '+large+' 1 '+x2.toFixed(2)+','+y2.toFixed(2)+' Z" fill="'+i.color+'"/>';
+  }).join('');
+  return'<svg width="'+d+'" height="'+d+'" viewBox="0 0 '+d+' '+d+'">'+arcs+'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*0.55)+'" fill="#fff"/></svg>';
+}
+
+// ---- Solution split ----
+function splitSolution(s){
+  if(!s)return[];
+  return s.split(/\s*\d\)\s*/).filter(function(x){return x.trim()}).map(function(x){return x.replace(/[；;]\s*$/,'').trim()});
+}
+
+// ===== PAGE 1: Overall =====
+function renderOverall(){
+  var o=DATA.overall;
+  var goalPie=DATA.goalPie,agentPie=DATA.agentPie;
+  var goalColorByName={};
+  DATA.goals.forEach(function(g){goalColorByName[g.name]=GOAL_COLORS[g.id]});
+  var gLeg=goalPie.map(function(g){return'<div class="li"><span class="sw" style="background:'+goalColorByName[g.name]+'"></span><span class="nm">'+g.name+'</span><span class="vl">'+fmt.moneyW(g.cost)+'</span><span class="pc">'+(g.cost/o.cost*100).toFixed(1)+'%</span></div>'}).join('');
+  var aLeg=agentPie.map(function(a,i){return'<div class="li"><span class="sw" style="background:'+AGENT_COLORS[i]+'"></span><span class="nm">'+a.name+'</span><span class="vl">'+fmt.moneyW(a.cost)+'</span><span class="pc">'+(a.cost/o.cost*100).toFixed(1)+'%</span></div>'}).join('');
+
+  document.getElementById('kpiRow1').innerHTML=
+    '<div class="card kpi-big"><div class="lbl">总消耗<span class="unit">今日</span></div><div class="val">'+fmt.moneyW(o.cost)+'</div><div class="chg">'+fmt.chgFont(o.chg.cost)+'<span style="opacity:.85"> 较前日</span></div></div>'+
+    '<div class="card"><div class="lbl">优化目标消耗占比<span class="unit">4个目标</span></div><div class="pie">'+pieSvg(goalPie.map(function(g){return{label:g.name,value:g.cost,color:goalColorByName[g.name]}}),140)+'<div class="pie-legend">'+gLeg+'</div></div></div>'+
+    '<div class="card"><div class="lbl">代理消耗占比<span class="unit">4家</span></div><div class="pie">'+pieSvg(agentPie.map(function(a,i){return{label:a.name,value:a.cost,color:AGENT_COLORS[i]}}),140)+'<div class="pie-legend">'+aLeg+'</div></div></div>';
+
+  var r2items=[
+    ['竞价CPM','cpm',o.cpm,'元',function(v){return fmt.money(v)}],
+    ['目标出价','bid',o.bid,'元',function(v){return v<1?v.toFixed(4):v.toFixed(2)}],
+    ['CTR','ctr',o.ctr,'%',function(v){return v.toFixed(2)+'%'}],
+    ['CVR','cvr',o.cvr,'%',function(v){return v.toFixed(2)+'%'}],
+    ['转化成本','cpa',o.cpa,'元',function(v){return v<1?v.toFixed(4):v.toFixed(2)}]
+  ];
+  document.getElementById('kpiRow2').innerHTML=r2items.map(function(it){return'<div class="card"><div class="lbl">'+it[0]+'<span class="unit">'+it[3]+'</span></div><div class="val val-sm">'+it[4](it[2])+'</div><div class="chg">'+fmt.chgFont(o.chg[it[1]])+'<span style="color:var(--sub2)"> 较前日</span></div></div>'}).join('');
+
+  var arpuAcc=o.cost/o.accounts,arpuAd=o.cost/o.ads,arpuCre=o.cost/o.creatives;
+  var r3items=[['账户数',o.accounts,'','accounts'],['广告数',o.ads,'','ads'],['创意数',o.creatives,'个','creatives'],['ARPU·账户',arpuAcc,'',null],['ARPU·广告',arpuAd,'',null],['ARPU·创意',arpuCre,'',null]];
+  document.getElementById('kpiRow3').innerHTML=r3items.map(function(it,i){var v=it[1],k=it[3];var chg=k?fmt.chgFont(o.chg[k]):'<span class="chg-flat">总消耗/数量</span>';return'<div class="card"><div class="lbl">'+it[0]+'<span class="unit">'+it[2]+'</span></div><div class="val val-sm">'+(k?fmt.int(v):fmt.money(v))+'</div><div class="chg">'+chg+'</div></div>'}).join('');
+}
+
+// ===== PAGE 1: Common Issues =====
+function renderCommonIssues(){
+  var ci=DATA.common_issues||[];
+  if(!ci.length){document.getElementById('commonIssues').innerHTML='<div class="empty-state">暂未出现 3 家及以上代理共有的问题</div>';return}
+  var tagMap={'high':'需关注','mid':'观察','info':'信息','good':'正向'};
+  document.getElementById('commonIssues').innerHTML=ci.map(function(item){
+    var cls='common-issue ci-'+item.kind;
+    var badge='<span class="ci-badge">'+ (tagMap[item.kind]||'信息')+'</span>';
+    var agList=item.agents.map(function(e){return'<li><span class="agn">'+e.agent+'</span>'+e.finding+'</li>'}).join('');
+    var solLines=splitSolution(item.solution);
+    var solHTML=solLines.length?
+      '<div class="sol-box">'+solLines.map(function(l,i){return (i+1)+') '+l}).join('<br>')+'</div>':'';
+    return'<div class="'+cls+'"><div class="ci-head">'+badge+item.tag+'<span style="margin-left:auto;font-size:11px;color:var(--sub);font-weight:500">'+item.agents.length+'/'+DATA.agents.length+' 家代理</span></div><div class="ci-body"><ul class="ag-list">'+agList+'</ul>'+solHTML+'</div></div>';
+  }).join('');
+}
+
+// ===== PAGE 1: Goal Summary (expandable, sorted by cost %) =====
+function renderGoalSummary(){
+  var goals=DATA.goals;
+  var bg=DATA.byGoal;
+  var o=DATA.overall;
+  var byAG=DATA.byAgentGoal;
+  function fmtCost(v){return v<10000?'¥'+v.toFixed(2):'¥'+(v/10000).toFixed(2)+'万'}
+  function fmtCpa(v){return v<1?'¥'+v.toFixed(4):'¥'+v.toFixed(2)}
+  // 收集并按 消耗占比 降序排序
+  var rows=goals.map(function(g){
+    var d=bg[g.id];
+    if(!d) return null;
+    return {g:g, d:d, pct:o.cost>0?d.cost/o.cost*100:0};
+  }).filter(function(x){return x});
+  rows.sort(function(a,b){return b.pct - a.pct});
+  // 表格列：代理 | 消耗 | CPM | CTR | CVR | CPA | 广告数 | 创意数 (8 列)
+  // summary 行同步 8 列：展开图标 | 目标 | 消耗 | 占比 | CPM | CTR | CVR | CPA
+  var colWidths='30px 130px 110px 70px 80px 80px 80px 110px';
+  var headRow='<tr class="ge-head"><th></th><th>优化目标</th><th>消耗</th><th>占比</th><th>CPM</th><th>CTR</th><th>CVR</th><th>CPA</th></tr>';
+  var html='<table class="ge-outer" style="--colw:\''+colWidths+'\'"><colgroup><col><col><col><col><col><col><col><col></colgroup><thead>'+headRow+'</thead><tbody>';
+  rows.forEach(function(r){
+    var g=r.g, d=r.d, pct=r.pct;
+    var agentRows=byAG.filter(function(x){return x.goal_id===g.id && x.cost>0});
+    agentRows.sort(function(a,b){return b.cost-a.cost});
+    var aTRs=agentRows.map(function(x){
+      var a=DATA.agents.find(function(y){return y.id===x.agent_id});
+      return'<tr><td class="agent-name">'+a.short+'</td>'+
+        '<td>'+fmtCost(x.cost)+'</td>'+
+        '<td>¥'+(x.cpm||0).toFixed(2)+'</td>'+
+        '<td>'+((x.ctr||0).toFixed(2))+'%</td>'+
+        '<td>'+((x.cvr||0).toFixed(2))+'%</td>'+
+        '<td>'+fmtCpa(x.cpa||0)+'</td>'+
+        '<td>'+fmt.int(x.ads||0)+'</td>'+
+        '<td>'+fmt.int(x.creatives||0)+'</td></tr>';
+    }).join('');
+    html+=
+      '<tr class="ge-row"><td class="ge-arrow"><span class="ge-toggle">▼</span></td>'+
+        '<td class="ge-name">'+g.name+'</td>'+
+        '<td>'+fmt.moneyW(d.cost)+'</td>'+
+        '<td class="ge-pct">'+pct.toFixed(1)+'%</td>'+
+        '<td>¥'+(d.cpm||0).toFixed(2)+'</td>'+
+        '<td>'+((d.ctr||0).toFixed(2))+'%</td>'+
+        '<td>'+((d.cvr||0).toFixed(2))+'%</td>'+
+        '<td>'+fmtCpa(d.cpa||0)+'</td></tr>'+
+      '<tr class="ge-body"><td colspan="8"><div class="ge-body-inner">'+
+      '<table class="ge-inner"><thead><tr><th>代理</th><th>消耗</th><th>CPM</th><th>CTR</th><th>CVR</th><th>CPA</th><th>广告数</th><th>创意数</th></tr></thead><tbody>'+aTRs+'</tbody></table>'+
+      '</div></td></tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('goalSummary').innerHTML=html;
+  // 默认全部折叠
+  document.querySelectorAll('.ge-body').forEach(function(b){b.style.display='none';});
+  // 点击行展开
+  document.querySelectorAll('.ge-row').forEach(function(row){
+    row.addEventListener('click',function(){
+      var body=row.nextElementSibling;
+      var arrow=row.querySelector('.ge-toggle');
+      var open=row.classList.contains('ge-row-open');
+      body.style.display=open?'none':'table-row';
+      if(arrow)arrow.style.transform=open?'rotate(-90deg)':'rotate(0deg)';
+      row.classList.toggle('ge-row-open',!open);
+    });
+    row.style.cursor='pointer';
+  });
+  // 默认展开第一个
+  var firstRow=document.querySelector('.ge-row');
+  if(firstRow) firstRow.click();
+}
+
+// ===== PAGE 2: Agent Selector & Content =====
+function initAgentPage(){
+  var sel=document.getElementById('agentSelect');
+  DATA.agents.forEach(function(a){
+    sel.innerHTML+='<option value="'+a.id+'">'+a.short+' — '+a.full+'</option>';
+  });
+  sel.addEventListener('change',function(){
+    renderAgentPage(this.value);
+  });
+}
+
+function renderAgentPage(agentId){
+  var ga=document.getElementById('singleAgentGoals');
+  var gf=document.getElementById('singleAgentFindings');
+  if(!agentId){ga.innerHTML='';gf.innerHTML='';return}
+  var a=DATA.agents.find(function(x){return x.id===agentId});
+  if(!a){return}
+  var ag=DATA.byAgent[agentId];
+  // Agent goals table
+  var byAG=DATA.byAgentGoal.filter(function(r){return r.agent_id===agentId});
+  var goals=DATA.goals;
+  byAG.sort(function(x,y){var gx=goals.find(function(g){return g.id===x.goal_id});var gy=goals.find(function(g){return g.id===y.goal_id});return(gx?gx.order:99)-(gy?gy.order:99)});
+  function fmtCost(v){return v<10000?'¥'+v.toFixed(2):'¥'+(v/10000).toFixed(2)+'万'}
+  var trs=byAG.map(function(r){
+    var g=goals.find(function(g){return g.id===r.goal_id});
+    return'<tr>'+
+      '<td>'+(g?g.name:'—')+'</td>'+
+      '<td>'+fmtCost(r.cost)+'</td>'+
+      '<td>¥'+(r.cpm||0).toFixed(2)+'</td>'+
+      '<td>'+((r.ctr||0).toFixed(2))+'%</td>'+
+      '<td>'+((r.cvr||0).toFixed(2))+'%</td>'+
+      '<td>¥'+((r.cpa||0)<1?(r.cpa||0).toFixed(4):(r.cpa||0).toFixed(2))+'</td>'+
+      '<td>'+fmt.int(r.ads||0)+'</td>'+
+      '<td>'+fmt.int(r.creatives||0)+'</td>'+
+      '<td>'+fmt.chgFont(r.chg.cost)+'</td>'+
+    '</tr>';
+  }).join('');
+
+  // Agent summary row
+  var oCost=DATA.overall.cost;
+  var summaryRow='<tr style="background:#F5F7FF;font-weight:700"><td>整体（'+a.short+'）</td><td>'+fmtCost(ag.cost)+'</td><td>¥'+(ag.cpm||0).toFixed(2)+'</td><td>'+((ag.ctr||0).toFixed(2))+'%</td><td>'+((ag.cvr||0).toFixed(2))+'%</td><td>¥'+((ag.cpa||0)<1?(ag.cpa||0).toFixed(4):(ag.cpa||0).toFixed(2))+'</td><td>'+fmt.int(ag.ads||0)+'</td><td>'+fmt.int(ag.creatives||0)+'</td><td>'+fmt.chgFont(ag.chg.cost)+'</td></tr>';
+
+  ga.innerHTML='<div class="subsec-head">'+a.short+' · 各优化目标表现<span class="badge">消耗: '+fmt.moneyW(ag.cost)+' | 大盘占比: '+(ag.cost/oCost*100).toFixed(1)+'%</span></div>'+
+    '<table class="agent-goal-tbl"><thead><tr><th>优化目标</th><th>消耗</th><th>CPM</th><th>CTR</th><th>CVR</th><th>CPA</th><th>广告数</th><th>创意数</th><th>消耗环比</th></tr></thead><tbody>'+summaryRow+trs+'</tbody></table>';
+
+  // Agent findings
+  var fEntry=DATA.findings.find(function(f){return f.agent.id===agentId});
+  if(!fEntry||!fEntry.findings.length){gf.innerHTML='<div class="empty-state">该代理各项指标运行平稳，暂无需特别关注</div>';return}
+  var tagMap={'high':'需关注','mid':'观察','info':'信息','good':'正向'};
+  var rowsHTML=fEntry.findings.map(function(f){
+    var rc='row-'+(f.kind||'info');
+    var badge='<span class="badge-h">'+(tagMap[f.kind]||'信息')+'</span>';
+    var solLines=splitSolution(f.solution);
+    var solHTML='<ol class="sol-list">'+solLines.map(function(l){return'<li>'+l+'</li>'}).join('')+'</ol>';
+    return'<tr class="'+rc+'"><td class="col1">'+badge+f.tag+'</td><td class="col2">'+f.finding+'</td><td class="col3">'+solHTML+'</td></tr>';
+  }).join('');
+  gf.innerHTML='<div class="subsec-head">核心发现<span class="badge">'+fEntry.findings.length+' 项问题</span></div><table class="findings-tbl"><thead><tr><th>问题</th><th>详细问题</th><th>处置建议</th></tr></thead><tbody>'+rowsHTML+'</tbody></table>';
+}
+
+// ===== PAGE 3: Apps =====
+function renderAppTop10(){
+  var apps=DATA.top10Apps;
+  if(!apps.length){document.getElementById('appTop10').innerHTML='<div class="empty-state">暂无数据</div>';return}
+  var totalCost=DATA.overall.cost;
+  apps.forEach(function(a){a._cost_pct=a.cost/totalCost*100});
+  var COLS=[{key:'cost',dir:'up',skipBest:false},{key:'_cost_pct',dir:'up',skipBest:true},{key:'cpm',dir:'down',skipBest:false},{key:'ctr',dir:'up',skipBest:false},{key:'cpa',dir:'down',skipBest:false},{key:'ads',dir:'up',skipBest:false},{key:'creatives',dir:'up',skipBest:false}];
+  var best={};
+  COLS.forEach(function(c){
+    if(c.skipBest){best[c.key]=new Set();return}
+    var asc=(c.dir==='down');
+    var sorted=apps.slice().sort(function(a,b){return asc?a[c.key]-b[c.key]:b[c.key]-a[c.key]});
+    if(!sorted.length)return;
+    var top=sorted[0][c.key];
+    if(Math.abs(top)<1e-9){best[c.key]=new Set();return}
+    best[c.key]=new Set();
+    apps.forEach(function(r,idx){if(asc?r[c.key]<=top+Math.abs(top)*0.001:r[c.key]>=top-Math.abs(top)*0.001)best[c.key].add(idx)});
+  });
+  function cell(m,i,vs){var is=best[m]&&best[m].has(i);return'<td class="'+(is?'best-cell':'')+'">'+vs+'</td>'}
+  var rows=apps.map(function(a,i){return'<tr><td class="'+(i<3?'rank-top':'')+'">'+(i+1<10?'0'+(i+1):(i+1))+'</td><td>'+a.app+'</td>'+cell('cost',i,fmt.moneyW(a.cost))+'<td class="bold-col">'+a._cost_pct.toFixed(1)+'%</td>'+cell('cpm',i,'¥'+a.cpm.toFixed(2))+cell('ctr',i,a.ctr.toFixed(2)+'%')+cell('cpa',i,'¥'+(a.cpa<1?a.cpa.toFixed(4):a.cpa.toFixed(2)))+cell('ads',i,fmt.int(a.ads))+cell('creatives',i,fmt.int(a.creatives))+'</tr>'}).join('');
+  document.getElementById('appTop10').innerHTML='<table class="app-table"><thead><tr><th>#</th><th>APP</th><th>消耗</th><th>占比</th><th>CPM</th><th>CTR</th><th>CPA</th><th>广告数</th><th>创意数</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+// ===== PAGE 3: Third =====
+function renderThird(){
+  var t=DATA.thirdAgg,n=DATA.nonThirdAgg,ovCost=DATA.overall.cost;
+  var overviewHTML='<div class="third-overview"><div class="h">三方logo素材（整体）</div><div class="stats">'+
+    '<div class="st"><div class="sl">消耗</div><div class="sv">'+fmt.moneyW(t.cost)+'<span style="font-size:11px;color:var(--sub);font-weight:500">（占大盘 '+(t.cost_pct||0).toFixed(1)+'%）</span></div></div>'+
+    '<div class="st"><div class="sl">广告数</div><div class="sv">'+fmt.int(t.ads)+'条</div></div>'+
+    '<div class="st"><div class="sl">CTR</div><div class="sv">'+(t.ctr||0).toFixed(2)+'%</div></div>'+
+    '<div class="st"><div class="sl">转化成本</div><div class="sv">¥'+((t.cpa<1?'0.'+t.cpa.toFixed(4).split('.')[1]:t.cpa.toFixed(2)))+'</div></div>'+
+  '</div></div>';
+
+  function fmtCpm(v){return'¥'+(v||0).toFixed(2)}
+  function fmtCtr(v){return(v||0).toFixed(2)+'%'}
+  function fmtPct(v){return(v||0).toFixed(1)+'%'}
+  function betterLow(a,b){if(a<=0||b<=0)return 0;if(a<b)return 1;if(b<a)return -1;return 0}
+  function betterHigh(a,b){if(a<=0||b<=0)return 0;if(a>b)return 1;if(b>a)return -1;return 0}
+  var cpmWho=betterLow(t.cpm||0,n.cpm||0),ctrWho=betterHigh(t.ctr||0,n.ctr||0);
+  function perfCell(val,who,side,fFn){var cls='';if(who===1&&side==='t')cls='cell-better';else if(who===-1&&side==='n')cls='cell-better';else if(who!==0)cls='cell-worse';return'<td class="'+cls+'">'+fFn(val)+'</td>'}
+  var t_pct=ovCost?(t.cost||0)/ovCost*100:0,n_pct=ovCost?(n.cost||0)/ovCost*100:0;
+  var cmpTable='<h3 style="margin-top:16px">② 三方 vs 非三方 对比</h3><div class="cs">不含转化成本/CVR；含账户数/广告数/创意数</div>'+
+    '<table class="third-cmp-tbl"><thead><tr><th>指标</th><th>消耗</th><th>占比</th><th>CPM</th><th>CTR</th><th>账户数</th><th>广告数</th><th>创意数</th></tr></thead><tbody>'+
+    '<tr class="row-third"><td>三方</td><td>'+fmt.moneyW(t.cost)+'</td><td>'+fmtPct(t_pct)+'</td>'+perfCell(t.cpm,cpmWho,'t',fmtCpm)+perfCell(t.ctr,ctrWho,'t',fmtCtr)+'<td>'+fmt.int(t.accounts)+'</td><td>'+fmt.int(t.ads)+'</td><td>'+fmt.int(t.creatives)+'</td></tr>'+
+    '<tr class="row-non"><td>非三方</td><td>'+fmt.moneyW(n.cost)+'</td><td>'+fmtPct(n_pct)+'</td>'+perfCell(n.cpm,cpmWho,'n',fmtCpm)+perfCell(n.ctr,ctrWho,'n',fmtCtr)+'<td>'+fmt.int(n.accounts)+'</td><td>'+fmt.int(n.ads)+'</td><td>'+fmt.int(n.creatives)+'</td></tr>'+
+    '</tbody></table>';
+
+  // Third by agent
+  var tbaRows=DATA.thirdByAgent||[];
+  var ordered=[];
+  DATA.agents.forEach(function(a){
+    var tr=tbaRows.find(function(r){return r.agent_id===a.id&&r.is_third});
+    var nr=tbaRows.find(function(r){return r.agent_id===a.id&&!r.is_third});
+    if(tr)ordered.push(tr);if(nr)ordered.push(nr);
+  });
+  var tbaHTML=ordered.map(function(r){return'<tr><td>'+r.agent_short+'</td><td>'+(r.is_third?'<span class="tf-third is-third">三方</span>':'<span class="tf-third is-non">非三方</span>')+'</td><td>'+fmt.moneyW(r.cost)+'</td><td>'+(r.cost_pct||0).toFixed(1)+'%</td><td>'+((r.ctr||0).toFixed(2))+'%</td><td>'+fmt.int(r.accounts||0)+'</td><td>'+fmt.int(r.ads||0)+'</td><td>'+fmt.int(r.creatives||0)+'</td></tr>'}).join('');
+  var tbaTable='<h3 style="margin-top:16px">③ 三方按代理分</h3><div class="cs">每代理×（三方/非三方）消耗与资源数</div>'+
+    '<table class="third-byagent-tbl"><thead><tr><th>代理</th><th>是否三方</th><th>消耗</th><th>占比</th><th>CTR</th><th>账户数</th><th>广告数</th><th>创意数</th></tr></thead><tbody>'+tbaHTML+'</tbody></table>';
+
+  document.getElementById('thirdSpec').innerHTML='<h3>① 三方logo素材（现状）</h3>'+overviewHTML+cmpTable+tbaTable;
+}
+
+// ===== PAGE 3: PCK =====
+function renderPck(){
+  var p=DATA.pckAgg,n=DATA.nonPckAgg,ovCost=DATA.overall.cost;
+  var overviewHTML='<div class="pck-overview"><div class="h">平台频道库（整体）</div><div class="stats">'+
+    '<div class="st"><div class="sl">消耗</div><div class="sv">'+fmt.moneyW(p.cost||0)+'<span style="font-size:11px;color:var(--sub);font-weight:500">（占大盘 '+(p.cost_pct||0).toFixed(1)+'%）</span></div></div>'+
+    '<div class="st"><div class="sl">广告数</div><div class="sv">'+fmt.int(p.ads||0)+'条</div></div>'+
+    '<div class="st"><div class="sl">CTR</div><div class="sv">'+((p.ctr||0)>0?(p.ctr||0).toFixed(2)+'%':'—')+'</div></div>'+
+    '<div class="st"><div class="sl">转化成本</div><div class="sv">'+((p.cpa||0)>0?'¥'+(p.cpa<1?p.cpa.toFixed(4):p.cpa.toFixed(2)):'—')+'</div></div>'+
+  '</div></div>';
+
+  function fmtCtr(v){return v>0?(v||0).toFixed(2)+'%':'—'}
+  function fmtCpm(v){return v>0?'¥'+(v||0).toFixed(2):'—'}
+  function fmtPct(v){return(v||0).toFixed(1)+'%'}
+  function betterLow(a,b){if(a<=0||b<=0)return 0;if(a<b)return 1;if(b<a)return -1;return 0}
+  function betterHigh(a,b){if(a<=0||b<=0)return 0;if(a>b)return 1;if(b>a)return -1;return 0}
+  var cpmWho=betterLow(p.cpm||0,n.cpm||0),ctrWho=betterHigh(p.ctr||0,n.ctr||0),cvrWho=betterHigh(p.cvr||0,n.cvr||0);
+  function perfCell(val,who,side,fFn){var cls='';if(who===1&&side==='p')cls='cell-better';else if(who===-1&&side==='n')cls='cell-better';else if(who!==0)cls='cell-worse';return'<td class="'+cls+'">'+fFn(val)+'</td>'}
+  function numCell(val,fFn){if((val||0)===0)return'<td>—</td>';return'<td>'+fFn(val)+'</td>'}
+  var p_pct=ovCost?(p.cost||0)/ovCost*100:0,n_pct=ovCost?(n.cost||0)/ovCost*100:0;
+  var cmpTable='<h3 style="margin-top:16px">② 平台频道库 vs 非平台频道库 对比</h3><div class="cs">整体对比（含 CVR，不含 CPA）</div>'+
+    '<table class="pck-cmp-tbl"><thead><tr><th>指标</th><th>消耗</th><th>占比</th><th>CPM</th><th>CTR</th><th>CVR</th><th>账户数</th><th>广告数</th><th>创意数</th></tr></thead><tbody>'+
+    '<tr class="row-pck"><td>平台频道库</td>'+numCell(p.cost,fmt.moneyW)+numCell(p_pct,fmtPct)+perfCell(p.cpm,cpmWho,'p',fmtCpm)+perfCell(p.ctr,ctrWho,'p',fmtCtr)+perfCell(p.cvr,cvrWho,'p',fmtCtr)+numCell(p.accounts,fmt.int)+numCell(p.ads,fmt.int)+numCell(p.creatives,fmt.int)+'</tr>'+
+    '<tr class="row-non"><td>非平台频道库</td>'+numCell(n.cost,fmt.moneyW)+numCell(n_pct,fmtPct)+perfCell(n.cpm,cpmWho,'n',fmtCpm)+perfCell(n.ctr,ctrWho,'n',fmtCtr)+perfCell(n.cvr,cvrWho,'n',fmtCtr)+numCell(n.accounts,fmt.int)+numCell(n.ads,fmt.int)+numCell(n.creatives,fmt.int)+'</tr>'+
+    '</tbody></table>';
+
+  // PCK by agent
+  var pbaRows=DATA.pckByAgentFull||[];
+  var ordered=[];
+  DATA.agents.forEach(function(a){
+    var pr=pbaRows.find(function(r){return r.agent_id===a.id&&r.is_pck});
+    var nr=pbaRows.find(function(r){return r.agent_id===a.id&&!r.is_pck});
+    if(pr)ordered.push(pr);if(nr)ordered.push(nr);
+  });
+  var pbaHTML=ordered.map(function(r){return'<tr><td>'+r.agent_short+'</td><td>'+(r.is_pck?'<span class="pf-pck used">使用</span>':'<span class="pf-pck unused">未使用</span>')+'</td><td>'+fmt.moneyW(r.cost)+'</td><td>'+(r.cost_pct||0).toFixed(1)+'%</td><td>'+((r.ctr||0).toFixed(2))+'%</td><td>'+fmt.int(r.accounts||0)+'</td><td>'+fmt.int(r.ads||0)+'</td><td>'+fmt.int(r.creatives||0)+'</td></tr>'}).join('');
+  var pbaTable='<h3 style="margin-top:16px">③ 平台频道库按代理分</h3><div class="cs">每代理×（使用/未使用）消耗与资源数</div>'+
+    '<table class="pck-byagent-tbl"><thead><tr><th>代理</th><th>是否使用</th><th>消耗</th><th>占比</th><th>CTR</th><th>账户数</th><th>广告数</th><th>创意数</th></tr></thead><tbody>'+pbaHTML+'</tbody></table>';
+  var pckPct=(p.cost/(p.cost+n.cost)*100)||0;
+  var emptyNote=p.cost===0?'<div class="empty-state"><span class="big">0%</span>当前所有广告类目均为「应用商店」，平台频道库使用率为<b>0%</b>，尚有较大开拓空间。</div>':(pckPct<1?'<div class="empty-state"><span class="big">'+pckPct.toFixed(1)+'%</span>平台频道库使用率仅 <b>'+pckPct.toFixed(1)+'%</b>（'+p.ads+' 条广告 / ¥'+p.cost.toFixed(0)+'），主要仍依赖「应用商店」类目，分品类人群沉淀尚有较大开拓空间。</div>':'');
+
+  document.getElementById('pckSpec').innerHTML='<h3>① 平台频道库（现状）</h3>'+overviewHTML+cmpTable+pbaTable+emptyNote;
+}
+
+// ===== PAGE 3: Insight =====
+function renderInsight(){
+  var ins=DATA.insight;
+  document.getElementById('insight').innerHTML='<h3>💡 核心情况发现</h3><ul>'+ins.map(function(i){return'<li><span class="ititle">'+i.title+'</span><span class="icontext">'+i.context+'</span><span class="isuggestion">'+i.suggestion+'</span></li>'}).join('')+'</ul>';
+}
+
+// ===== Tab switching =====
+function initTabs(){
+  var btns=document.querySelectorAll('.tab-btn');
+  btns.forEach(function(b){
+    b.addEventListener('click',function(){
+      btns.forEach(function(x){x.classList.remove('active')});
+      this.classList.add('active');
+      var contents=document.querySelectorAll('.tab-content');
+      contents.forEach(function(c){c.classList.remove('active')});
+      document.getElementById(this.dataset.tab).classList.add('active');
+    });
+  });
+}
+
+// ===== Init =====
+function renderAll(){
+  document.getElementById('dataDate').textContent='2026-07-22';
+  renderOverall();
+  renderCommonIssues();
+  renderGoalSummary();
+  initAgentPage();
+  renderAppTop10();
+  renderThird();
+  renderPck();
+  renderInsight();
+  initTabs();
+}
+renderAll();
+})();
+</script>
+</body>
+</html>
